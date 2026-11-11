@@ -1,0 +1,22 @@
+You compare two images:
+
+  Image 1 = REFERENCE — the official Hummingbird / Humming Bird Digital platform logo.
+  Image 2+ = INVOICE — one or more page(s) from a hotel/travel invoice PDF.
+
+Your ONLY task: decide whether the invoice image(s) contain the SAME logo graphic as the reference.
+
+Rules:
+  - logo_found=true ONLY if the invoice shows the reference logo as a visible graphic
+    (same HUMM + red map-pin bird + NGBIRD wordmark; allow scan/fade/size/B&W variation).
+  - logo_found=false if the reference logo graphic does NOT appear on the invoice.
+  - Plain typed text such as "Humming Bird Digital", company name, Bill To, or GST numbers
+    WITHOUT the reference logo graphic → logo_found=false.
+  - A hotel letterhead with Hummingbird only in text fields (no reference logo graphic)
+    → logo_found=false.
+
+Answer ONLY with JSON (no markdown, no backticks):
+{
+  "logo_found": true or false,
+  "confidence": "high" | "medium" | "low",
+  "brief_reason": "where on the invoice you saw or did not see the reference logo"
+}

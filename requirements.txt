@@ -1,0 +1,151 @@
+
+# ============================================
+# Core Dependencies
+# ============================================
+# Environment variable management
+python-dotenv==1.0.0
+
+# HTTP requests library
+# Required for API calls in main.py and api.py
+requests==2.31.0
+
+# ============================================
+# Google APIs (Drive & OAuth)
+# ============================================
+# Required for Google Drive operations in google_drive_uploader.py and invoice_processor_final.py
+google-auth==2.23.4
+google-auth-oauthlib==1.1.0
+google-auth-httplib2==0.1.1
+google-api-python-client==2.108.0
+
+# ============================================
+# Data Processing
+# ============================================
+# Required for Excel operations in invoice_processor_final.py
+pandas==2.1.3
+python-dateutil==2.8.2
+
+# ============================================
+# Excel Operations
+# ============================================
+# Required for Excel file operations in invoice_processor_final.py
+openpyxl==3.1.2
+
+# ============================================
+# PDF Processing
+# ============================================
+# Basic PDF text extraction (optional - for password-protected PDFs if needed)
+PyPDF2==3.0.1
+# OCR for scanned PDFs (optional - for fallback GST extraction)
+pytesseract==0.3.10
+pdf2image==1.16.3
+Pillow==10.1.0
+# PyMuPDF (fitz) - Optional but used for OCR server fallback GST extraction
+PyMuPDF==1.23.8
+# Note: Tesseract OCR must be installed separately: https://github.com/tesseract-ocr/tesseract
+# Note: Poppler must be installed for pdf2image: https://poppler.freedesktop.org/
+
+# ============================================
+# AI/ML Services
+# ============================================
+# OpenAI API for email extraction and structured data extraction
+# Supports both Azure OpenAI and regular OpenAI
+openai>=1.12.0
+# httpx for OpenAI client
+httpx>=0.25.0
+
+# ============================================
+# HTML Parsing
+# ============================================
+# Required for parsing HTML tables in emails
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# ============================================
+# String Matching (Fuzzy Logic)
+# ============================================
+# Required for vendor name matching in invoice_processor_final.py
+rapidfuzz==3.11.0
+fuzzywuzzy==0.18.0
+python-levenshtein==0.21.1
+
+# ============================================
+# AWS SDK (Optional - for other scripts)
+# ============================================
+# For Bedrock AI analysis in openai_vision_extractor.py (if used)
+boto3==1.34.0
+
+
+
+# REST API (Optional - for React frontend integration)
+fastapi==0.109.0
+uvicorn[standard]==0.25.0
+python-multipart==0.0.6
+aiofiles==23.2.1
+pydantic==2.5.3
+
+# ============================================
+# Azure Cloud Services
+# ============================================
+# Azure Blob Storage SDK for uploading PDFs
+# Required for blob.py operations
+azure-storage-blob==12.19.0
+azure-identity==1.15.0
+
+# ============================================
+# Database (MySQL)
+# ============================================
+# Required for MySQL database operations in load_data.py and main.py
+sqlalchemy==2.0.23
+mysql-connector-python==8.2.0
+
+# ============================================
+# Additional Utilities
+# ============================================
+# For better date/time handling
+pytz==2023.3
+
+# ============================================
+# Installation Notes
+# ============================================
+# PDF Processing:
+#   - pdf2image converts PDFs to images for OpenAI Vision API
+#   - PyMuPDF (fitz) is used optionally for OCR server fallback
+#   - Images are uploaded to Azure Blob Storage and sent to OpenAI Vision API
+#   - Poppler must be installed for pdf2image: https://poppler.freedesktop.org/
+#   - Tesseract OCR must be installed separately for pytesseract: https://github.com/tesseract-ocr/tesseract
+#
+# OpenAI Vision API:
+#   - Uses GPT-4o-mini or GPT-5-mini with vision capabilities
+#   - Supports both Azure OpenAI and regular OpenAI
+#   - Requires AZURE_OPENAI_API_KEY/AZURE_OPENAI_BASE_URL or OPENAI_API_KEY in .env file
+#
+# Azure Blob Storage:
+#   - Used for storing uploaded PDF files organized by vendor folders
+#   - Requires BLOB_STORAGE_SAS_URL in .env file
+#
+# Google Drive:
+#   - Used for Excel file management and sharing
+#   - Requires ENABLE_GOOGLE_DRIVE_UPLOAD=true and OAuth credentials
+#
+# Frontend (Node.js):
+#   - React frontend uses axios for API calls (install via npm in frontend/)
+#   - See frontend/package.json for Node.js dependencies
+#
+# Minimum Python version: 3.8
+# Recommended Python version: 3.10 or higher
+
+streamlit
+pandas
+python-dotenv
+PyPDF2
+fuzzywuzzy
+python-Levenshtein
+beautifulsoup4
+openpyxl
+boto3
+google-api-python-client
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+

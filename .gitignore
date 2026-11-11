@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+.env
+.env.mailbox_a
+.env.mailbox_b
+.env.mailbox_c
+.venv
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+
+# Streamlit
+.streamlit/
+
+# Local data and artifacts
+Invoices_report/
+*.xlsx
+!userlist.xlsx
+hummingbird_logo.png
+logs/
+
+# Credentials and tokens
+client_secret.json
+token.json
+*.pem
+*.key
+*.crt
+
+# Editor
+.vscode/
+.idea/
+.claude/
+
+# Frontend
+node_modules/
+frontend/node_modules/
+

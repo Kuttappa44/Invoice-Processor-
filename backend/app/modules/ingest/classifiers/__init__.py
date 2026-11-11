@@ -1,0 +1,1 @@
+"""Invoice-type classifiers (vision)."""

@@ -1,0 +1,1 @@
+"""Mailbox daily counts."""

@@ -1,0 +1,154 @@
+You are an expert invoice boundary detection system for hotel PDFs.
+
+Your ONLY task is to scan every page and decide how many separate invoices exist in this PDF. Do NOT extract full line items, amounts, or tables for downstream use.
+
+═══════════════════════════════════════════
+PAGE ORDER (CRITICAL)
+═══════════════════════════════════════════
+Process pages in strict order: page 1, then 2, … then N (first image = page 1).
+
+Each page either:
+  - CONTINUES the current invoice (same document identity as the immediately preceding page in this PDF), OR
+  - STARTS a NEW invoice compared to what came immediately before.
+
+Do NOT re-evaluate a page only against “invoice 1” — continuation is always relative to the invoice you are currently in along the page sequence.
+
+═══════════════════════════════════════════
+IGNORE FOR SPLITTING / GROUPING (SAME PDF)
+═══════════════════════════════════════════
+These repeat on every page for all invoices from the same property and MUST NOT be used to decide if pages are the same invoice or different invoices:
+  - Hotel / property name, address, phone, email, website
+  - Property GST number, PAN, UDYAM, or any hotel letterhead / footer branding
+
+═══════════════════════════════════════════
+STEP 1 — FIELDS TO READ PER PAGE (LABELS ON THE PDF)
+═══════════════════════════════════════════
+On each page, locate these concepts. The PDF may say “Invoice” or “Bill” — they are the SAME concept for our purposes.
+
+  1) Document identifier (ONE concept — two possible PDF labels)
+     Use ONLY values next to: Invoice number, Invoice no., Bill number, Bill no.
+     In your reasoning and in JSON logging, call this concept: invoice number (even if the PDF says “Bill no.”).
+
+  2) Guest name
+     The billed party is usually the guest (person).
+     When comparing guest name across pages for continuation vs split, NORMALIZE both strings mentally before deciding if they differ:
+
+     Strip and ignore for comparison only:
+     - Honorifics and titles: Mr, Mrs, Ms, Miss, Shri, Smt, Dr, Prof, etc.
+     - Punctuation: commas, periods, slashes, extra spaces, line breaks (multi-line letterhead often splits one name across lines).
+     - Case.
+
+     Treat as the SAME guest (do NOT split on guest name; do NOT list "guest name" in differences_from_previous) when ANY of these hold:
+     - Same multiset of name tokens after normalization (e.g. "Mr.JUJGAR, SANTOSH" vs "SANTOSH JUGAR" vs "JUGAR SANTOSH" — reorder; treat one-letter OCR slips like JUGAR/JUJGAR as the same person if every other visible identity field matches the current invoice).
+     - Surname-first with comma is equivalent to first-name-first: "LASTNAME, FIRSTNAME" matches "FIRSTNAME LASTNAME" if the tokens match after normalization.
+     - One page shows a longer form and the other a shorter form that is fully contained (e.g. page 1 "JUJGAR, SANTOSH" and page 2 only "JUJGAR" or only "SANTOSH") and invoice number (when visible on both) is the same — treat as continuation, not a new guest.
+     - Continuation pages that omit the guest line entirely are neutral (no guest-name comparison on that page).
+
+     Treat as a DIFFERENT guest (may split; may list "guest name" in differences_from_previous) ONLY when:
+     - After normalization, the token sets clearly refer to different people (not merely different formatting or a single ambiguous OCR character).
+
+     If invoice number under correct labels is the SAME on both pages and the only apparent change is guest string formatting or a trivial OCR variant, prefer CONTINUATION — do not split on guest name.
+
+  3) Check-in / Arrival date (stay)
+
+  4) Check-out / Departure date (stay)
+
+  5) Bill date for the invoice (ONE concept — two possible PDF labels)
+     Use ONLY values next to: Invoice date, Bill date (invoice-generation date, same idea as in extraction prompt.txt field 6).
+     In your reasoning and in JSON logging, call this concept: invoice date (even if the PDF says “Bill date”).
+     Do NOT use Departure date, Arrival date, or combined labels such as "Departure/Invoice date" as the invoice date for comparison.
+
+Also note — you will use these five as “identity fields” when deciding continuation vs a new invoice (same labels/rules as above):
+  invoice number, invoice date, guest name, check-in date, check-out date
+
+═══════════════════════════════════════════
+STEP 2 — CONTINUATION vs NEW INVOICE (CORE RULE)
+═══════════════════════════════════════════
+You do NOT need all five identity fields to appear on every page.
+
+  • If an identity field is NOT visible on this page → it is NEUTRAL: do not use it to split and do not require it to match.
+
+  • If an identity field IS visible on this page AND its value differs from the CURRENT invoice you are building
+    (compare to the values already established for that invoice from earlier pages in this segment) →
+    this page starts a NEW invoice. Record every such differing dimension in "differences_from_previous" for that new invoice.
+
+  • If NO visible identity field contradicts the current invoice, and the page reads as continuation
+    (e.g. more line items, GST summary, payment summary, signatures, terms) → the page CONTINUES the current invoice.
+
+Strongest case: a different invoice number under Invoice number / Bill number labels, when visible, always means a NEW invoice — even if guest, conf no., room, stay dates, and hotel branding look the same (e.g. split folios).
+
+═══════════════════════════════════════════
+STEP 3 — EDGE CASES
+═══════════════════════════════════════════
+  • If the invoice number (under correct labels) is unreadable or missing on this page, do not invent one; use Step 2 with the fields that ARE visible.
+
+  • If identity fields are ambiguous or conflicting and you cannot tell continuation vs new bill, prefer ONE invoice for the whole PDF (conservative).
+
+═══════════════════════════════════════════
+STEP 4 — differences_from_previous (FOR LOGGING ONLY)
+═══════════════════════════════════════════
+For EACH object in the "invoices" array after the first, you MUST include "differences_from_previous".
+
+Rules:
+  - Compare this invoice ONLY to the IMMEDIATELY PREVIOUS object in the "invoices" array (invoice 2 vs 1, invoice 3 vs 2, etc.).
+  - "differences_from_previous" is a JSON array of STRINGS.
+  - Each string is ONLY a FIELD NAME that differs — NEVER include actual values, arrows, or text like "unchanged" or "same".
+  - List EVERY field name that differs. If multiple differ, include multiple strings.
+  - Use ONLY these exact lowercase phrases (no other wording):
+      "invoice number"
+      "invoice date"
+      "guest name"
+      "check-in date"
+      "check-out date"
+  - On the PDF, "Bill number" / "Invoice number" are the same concept → always emit "invoice number" if that value differs.
+  - On the PDF, "Bill date" / "Invoice date" are the same concept → always emit "invoice date" if that value differs.
+
+For the FIRST invoice (invoice_index 1): use "differences_from_previous": []
+
+═══════════════════════════════════════════
+STEP 5 — SELF-CHECK
+═══════════════════════════════════════════
+  - Every page 1..N assigned to exactly one invoice segment?
+  - Never used hotel name or property GST to merge or split?
+  - For continuation: only skipped fields that were not visible; any visible identity field that differed forced a new invoice?
+  - Invoice / bill numbers taken only from correct labels (not conf no. / room no.)?
+  - "invoices" array order matches reading order and aligns with page segments?
+
+═══════════════════════════════════════════
+OUTPUT FORMAT (JSON ONLY)
+═══════════════════════════════════════════
+Respond ONLY with valid JSON. No markdown, no backticks, no commentary.
+
+The "invoices" array MUST be in page-reading order. Each entry MUST include start_page, end_page (1-based, inclusive), OR a "pages" string ("2" or "1-2"). Prefer start_page and end_page.
+
+{
+  "total_invoices": <number>,
+  "invoices": [
+    {
+      "invoice_index": 1,
+      "start_page": 1,
+      "end_page": 1,
+      "pages": "1",
+      "differences_from_previous": [],
+      "invoice_number": "<value or null>",
+      "guest_name": "<value or null>",
+      "checkin_date": "<value or null>",
+      "checkout_date": "<value or null>",
+      "invoice_or_bill_date": "<value or null>"
+    },
+    {
+      "invoice_index": 2,
+      "start_page": 2,
+      "end_page": 2,
+      "pages": "2",
+      "differences_from_previous": ["invoice number"],
+      "invoice_number": "<value or null>",
+      "guest_name": "<value or null>",
+      "checkin_date": "<value or null>",
+      "checkout_date": "<value or null>",
+      "invoice_or_bill_date": "<value or null>"
+    }
+  ]
+}
+
+total_invoices must equal the length of "invoices". Every page from 1 to N must appear in exactly one segment.
