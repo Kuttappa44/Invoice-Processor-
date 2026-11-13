@@ -1,0 +1,207 @@
+# CI + CD for the Invoice Processor dashboard (Vite SPA) and FastAPI backend.
+#
+# CI - runs on GitHub's machines (not this server) on every push to main and every pull
+# request. It never sees your .env or any production secret, so it cannot reach MySQL,
+# Gmail or Azure. Tests that need a database or credentials skip themselves when there
+# are none; that is expected.
+#   backend   - install Python deps, catch real code errors, run the unit tests
+#   frontend  - install npm deps, build the dashboard, keep the build as an artifact
+#
+# CD - ONLY after both CI jobs pass AND only for pushes to main (never for pull requests).
+# One job, "deploy", connects to the server over SSH and does two things, in this order:
+#   1. backend   - cicd-pipeline/deploy_backend_over_ssh.sh -> cicd-pipeline/deploy_backend.sh on the server.
+#                  If only the dashboard / tests / docs changed it does nothing. If Python or other
+#                  backend files changed it checks (server folder on main, no uncommitted changes,
+#                  no process_invoices run in progress), updates the code, restarts the service,
+#                  checks /api/health, and puts the old code back if it does not. If a guard stops
+#                  it the job goes RED with the reason, and the dashboard step below is skipped so
+#                  the two never get out of step; fix the cause and use "Re-run failed jobs".
+#   2. dashboard - takes the exact build CI just made and publishes it to frontend/dist (the folder
+#                  FastAPI serves). Checks the site, and rolls back by itself if the check fails.
+#                  See cicd-pipeline/deploy_over_ssh.sh and cicd-pipeline/deploy_frontend.sh.
+#
+# One-time setup this file relies on (Settings > Secrets and variables > Actions):
+#   Variables:  VITE_API_BASE_URL  optional. Leave empty so the dashboard calls same-origin /api
+#                                  (FastAPI serves the SPA). Set only if the UI must call another host.
+#               DEPLOY_HOST        server address
+#               DEPLOY_USER        login name on the server (ubuntu)
+#   Secrets:    DEPLOY_SSH_KEY     private half of a key made just for this; its public half is in
+#                                  the server's ~/.ssh/authorized_keys, prefixed with `restrict`
+#               DEPLOY_KNOWN_HOSTS the server's public host key line (so we only ever talk to the
+#                                  real server)
+#   And port 22 of the server must be reachable from GitHub.
+#
+# The server has no GitHub login of its own. For the backend step this job hands it GitHub's own
+# short-lived, read-only token for this run (never stored), so it can fetch the one commit.
+#
+# Server layout this workflow expects:
+#   REPO_DIR     /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover
+#   venv         $REPO_DIR/.venv
+#   systemd      invoice-processor  (uvicorn api_server:app, port 9005)
+#   health       http://localhost:9005/api/health
+#   busy check   http://localhost:9005/api/tasks/running-process  ("running": true)
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  backend:
+    name: Backend (lint + tests)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff
+
+      - name: Lint (syntax errors and undefined names)
+        run: ruff check --select E9,F63,F7,F82 --exclude .venv,venv,frontend,node_modules,cicd-pipeline-pack .
+
+      - name: Run unit tests
+        env:
+          PYTHONUTF8: "1"
+        run: python -m unittest discover -s backend/tests -t . -v
+
+  frontend:
+    name: Frontend (build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the dashboard
+        run: npm run build
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+
+      - name: Save the build
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-dist
+          path: frontend/dist
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    name: Deploy to the server
+    needs: [backend, frontend]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    env:
+      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+      EXPECTED_API_URL: ${{ vars.VITE_API_BASE_URL }}
+      DEPLOY_DIR: /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/frontend/dist
+      HEALTH_URL: http://localhost:9005/
+    steps:
+      - name: Get the deploy scripts
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: cicd-pipeline
+          persist-credentials: false
+
+      - name: Download the tested build
+        uses: actions/download-artifact@v4
+        with:
+          name: dashboard-dist
+          path: ${{ runner.temp }}/dashboard-dist
+
+      - name: Check the deploy settings exist
+        env:
+          HAVE_KEY: ${{ secrets.DEPLOY_SSH_KEY != '' }}
+          HAVE_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS != '' }}
+        run: |
+          missing=""
+          [ -n "$DEPLOY_HOST" ]       || missing="$missing variable:DEPLOY_HOST"
+          [ -n "$DEPLOY_USER" ]       || missing="$missing variable:DEPLOY_USER"
+          [ "$HAVE_KEY" = true ]      || missing="$missing secret:DEPLOY_SSH_KEY"
+          [ "$HAVE_HOSTS" = true ]    || missing="$missing secret:DEPLOY_KNOWN_HOSTS"
+          if [ -n "$missing" ]; then echo "::error::Missing GitHub settings:$missing"; exit 1; fi
+
+      - name: Prepare the SSH key
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          umask 077
+          key="$RUNNER_TEMP/deploy_key"
+
+          clean=$(printf '%s' "$DEPLOY_SSH_KEY" | tr -d '\r' | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//; /^$/d')
+          if ! printf '%s' "$clean" | grep -q 'BEGIN [A-Z ]*PRIVATE KEY'; then
+            clean=$(printf '%s' "$clean" | tr -d '[:space:]' | base64 -d 2>/dev/null || true)
+          fi
+          printf '%s\n' "$clean" > "$key"
+
+          if ! pub=$(ssh-keygen -y -f "$key" 2>/dev/null); then
+            rm -f "$key"
+            echo "::error::DEPLOY_SSH_KEY is not a readable private key (damaged or incomplete). Store it as a single base64 line."
+            exit 1
+          fi
+          echo "Deploy key fingerprint: $(printf '%s\n' "$pub" | ssh-keygen -lf - | cut -d' ' -f2)"
+
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" | tr -d '\r' > "$RUNNER_TEMP/known_hosts"
+
+      - name: Backend - update the code and restart (only if backend files changed)
+        env:
+          SSH_KEY_FILE: ${{ runner.temp }}/deploy_key
+          KNOWN_HOSTS_FILE: ${{ runner.temp }}/known_hosts
+          GIT_TOKEN: ${{ github.token }}
+          REPO_DIR: /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover
+          TARGET_SHA: ${{ github.sha }}
+          SERVICE_NAME: invoice-processor
+          STATUS_URL: http://localhost:9005/api/health
+          RUNNING_URL: http://localhost:9005/api/tasks/running-process
+        run: bash cicd-pipeline/deploy_backend_over_ssh.sh
+
+      - name: Dashboard - publish, verify, roll back if broken
+        env:
+          SSH_KEY_FILE: ${{ runner.temp }}/deploy_key
+          KNOWN_HOSTS_FILE: ${{ runner.temp }}/known_hosts
+        run: bash cicd-pipeline/deploy_over_ssh.sh "${{ runner.temp }}/dashboard-dist"
+
+      - name: Remove the SSH key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/deploy_key" "$RUNNER_TEMP/known_hosts"

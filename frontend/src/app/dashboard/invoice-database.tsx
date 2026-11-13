@@ -3,6 +3,7 @@ import { Database, Download, Search } from "lucide-react";
 import {
   INVOICE_DB_PAGE_SIZE,
   type InvoiceDbMatchFilter,
+  type InvoiceDbSummary,
 } from "../../lib/api/types";
 
 type InvoiceDatabaseProps = {
@@ -15,6 +16,7 @@ type InvoiceDatabaseProps = {
   page: number;
   loading: boolean;
   error: string | null;
+  summary: InvoiceDbSummary | null;
   onFromDate: (value: string) => void;
   onToDate: (value: string) => void;
   onMatch: (value: InvoiceDbMatchFilter) => void;
@@ -38,6 +40,7 @@ export function InvoiceDatabase({
   page,
   loading,
   error,
+  summary,
   onFromDate,
   onToDate,
   onMatch,
@@ -118,6 +121,33 @@ export function InvoiceDatabase({
         <p className="invoice-db__error" role="alert">
           {error}
         </p>
+      )}
+
+      {summary && (
+        <div className="invoice-db__summary" aria-label="Mailbox totals for this date range">
+          <div className="invoice-db__summary-item">
+            <span className="invoice-db__summary-label">Dates</span>
+            <span className="invoice-db__summary-value invoice-db__summary-value--dates">
+              {summary.fromDate} – {summary.toDate}
+            </span>
+          </div>
+          <div className="invoice-db__summary-item">
+            <span className="invoice-db__summary-label">Emails found</span>
+            <span className="invoice-db__summary-value">{summary.emailsFound}</span>
+          </div>
+          <div className="invoice-db__summary-item">
+            <span className="invoice-db__summary-label">Emails processed</span>
+            <span className="invoice-db__summary-value">{summary.emailsProcessed}</span>
+          </div>
+          <div className="invoice-db__summary-item">
+            <span className="invoice-db__summary-label">Invoices found</span>
+            <span className="invoice-db__summary-value">{summary.invoicesFound}</span>
+          </div>
+          <div className="invoice-db__summary-item">
+            <span className="invoice-db__summary-label">Invoices processed</span>
+            <span className="invoice-db__summary-value">{summary.invoicesProcessed}</span>
+          </div>
+        </div>
       )}
 
       {meta && (

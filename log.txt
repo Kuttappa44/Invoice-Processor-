@@ -1,0 +1,1648 @@
+nohup: ignoring input
+📧 FINAL INVOICE PROCESSOR - COMPLETE FLOW
+==================================================
+1. 📧 Check unread emails
+2. 📝 Extract invoice data from email content
+3. ☁️  Upload PDFs to Azure Blob Storage (organized by vendor)
+4. 📊 Save extracted data to MySQL
+==================================================
+✅ Blob Storage SAS URL configured
+
+📊 Master Excel disabled - using MySQL storage only
+✅ Loaded 11856 vendor references (row mapping)
+✅ Loaded 11856 vendor references
+✅ Connected to Gmail successfully! (mailbox: [Gmail]/All Mail)
+
+======================================================================
+📅 DAY 2026-09-14
+======================================================================
+
+📬 Counting mailbox emails and PDFs for 2026-09-14...
+Mailbox counts  2026-09-14  to  2026-09-14  (inclusive)
+Source: bills | instance: a | IMAP: bills@hummingbirdindia.com
+date  emails  pdfs
+Scanning 2026-09-14...
+  Found 294 email(s) on 2026-09-14
+  Progress 2026-09-14: 50/294
+  Progress 2026-09-14: 100/294
+  Progress 2026-09-14: 150/294
+  Progress 2026-09-14: 200/294
+  Progress 2026-09-14: 250/294
+2026-09-14  294  86
+
+FULL REPORT  2026-09-14  to  2026-09-14  (inclusive)
+--------------------------
+date        emails  pdfs
+2026-09-14  294     86  
+--------------------------
+TOTAL       294     86  
+
+MySQL upserted 1 day(s) into mailbox_daily_counts (source=bills, instance=a)
+   ✅ Mailbox counts saved for 2026-09-14 (Load Stats to refresh dashboard)
+🔍 Searching for emails (read + unread) on 2026-09-14 in [Gmail]/All Mail
+📧 Found 294 emails (read + unread) on 2026-09-14
+
+📨 Processing email 1/294 (2026-09-14)
+   From: Mail Delivery Subsystem <mailer-daemon@googlemail.com>
+   Subject: Delivery Status Notification (Failure)
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 2/294 (2026-09-14)
+   🔎 Detected 2 PDF(s) by content
+   From: Finance Tirupati <finance.tirupati@tajhotels.com>
+   Subject: RE:  ADVANCE PAYMENT INVOICE NOT RECEIVED–HUMMINGBIRD  - Taj Tirupati
+   🎯 INVOICE DETECTED! (PDF attachment found)
+   🔎 Detected 2 PDF(s) by content
+   🔎 Parsing HTML tables for booking data...
+   🧾 Detected 3 HTML table(s) in email body
+        ✓ Table row parsed: {'booking_code': '1313492', 'guest_name': 'Rajeev Ranjan Sinha', 'check_in_date': '08/09/2026', 'check_out_date': '09/09/2026', 'total_amount': '14738'}
+        ✓ Table row parsed: {'booking_code': '1313493', 'guest_name': 'Sunil Kumar Agarwal', 'check_in_date': '08/09/2026', 'check_out_date': '09/09/2026', 'total_amount': '14738'}
+   ✅ Parsed 2 table row(s) with potential data
+   ⚠️  Table rows found but no valid booking code parsed
+   🔄 Using OpenAI to fill missing fields for 2 table entry/entries...
+   📋 Processing table entry 1/2...
+   🤖 Using OpenAI to extract missing fields: property_name
+   ✅ OpenAI extracted email data: 3 fields found
+      • property_name: Taj Tirupati
+      ✅ Filled property_name = 'Taj Tirupati'
+   📋 Processing table entry 2/2...
+   🤖 Using OpenAI to extract missing fields: property_name
+   ✅ OpenAI extracted email data: 3 fields found
+      • property_name: Taj Tirupati
+      ✅ Filled property_name = 'Taj Tirupati'
+   ✅ Copied property_name from best table entry to top-level: Taj Tirupati
+   👤 Guest name(s) from email: Rajeev Ranjan Sinha, Sunil Kumar Agarwal
+   📎 Found 2 attachment(s)
+   📎 Processing 2 valid attachment(s)
+   📄 Found 2 PDF attachment(s) for analysis
+   📄 Analyzing PDF: Mr. Sunil Agarwal.pdf
+   📄 Processing PDF Mr. Sunil Agarwal.pdf using image-based extraction 
+   📤 Uploading 1 image(s) to Azure Blob Storage...
+      ✅ Uploaded: tmp12y1zatj_0.jpg -> https://hbbills.blob.core.windows.net/bill/temp_im...
+   📄 Reusing 1 uploaded page image(s) for Mr. Sunil Agarwal.pdf
+   ⏳ Waiting 2 seconds for image URLs to propagate...
+   🔍 Verifying image URL accessibility...
+      ✅ Image 1 URL is accessible
+   ✅ Successfully loaded prompt from /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/prompts/prompt.txt (23993 chars)
+   🔄 Extracting structured data using gpt-5-mini...
+      ⏳ Waiting 3 seconds before first API call to ensure URLs are ready...
+      🔍 Using max_completion_tokens: 8000 (attempt 1)
+      🔍 DEBUG: Checking for content filtering...
+         ⚠️  PROMPT FILTERING: [{'prompt_index': 0, 'content_filter_results': {'hate': {'filtered': False, 'severity': 'safe'}, 'jailbreak': {'detected': False, 'filtered': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}}}]
+         ⚠️  CHOICE FILTERING: {'hate': {'filtered': False, 'severity': 'safe'}, 'protected_material_code': {'detected': False, 'filtered': False}, 'protected_material_text': {'detected': False, 'filtered': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}}
+         Finish reason: stop
+         ⚠️  MESSAGE REFUSAL: None
+   📄 GPT output preview (first 500 chars):
+      [Extracted Text]
+TAJ
+TIRUPATI
+
+COPY OF INVOICE                            INVOICE
+GST ID                : 37AABCH5874R2ZP
+E-Commerce ID
+Hummingbird Digital Pvt Ltd
+Basement Flr 12-1-22
+Kannayyapeta Rd
+Nr Hotel Green Park
+Visakhapatnam AP 530002
+India
+
+Invoice No.        : 212639795        Date        : 09-09-26
+Page               : 1 of 1           Reverse Charge : No
+Rate Code          : R04              Segment     : RAC
+Rate               : 12490 INR        Package     :
+Room No. / Type    : ...
+      ✅ Total CGST extracted: 1124.10
+      ✅ Total SGST extracted: 1124.10
+      ✅ room_charge extracted: 12490.00
+      ✅ total_igst extracted: 0.00
+   🔍 Parsed data from GPT output for Mr. Sunil Agarwal.pdf:
+      Guest Name: 'Mr. Sunil Agarwal'
+      Hotel Name: 'TAJ TIRUPATI'
+      HBD GST: '37AABCH5874R2ZP'
+      Client GST: '37AAHCV8308G1Z2'
+      Bill Number: '212639795'
+      CGST Number: ''
+      SGST Number: ''
+      Total CGST: '1124.10'
+      Total SGST: '1124.10'
+      Room Charge: '12490.00'
+      Total Tariff: ''
+      Other Charges: ''
+      Total IGST: '0.00'
+      Total Taxes: ''
+      Discount: ''
+      Advance Received: ''
+   ✅ Loaded Hummingbird reference logo from /home/ubuntu/Invoice-processor/invoice/logo.png
+   🐦 Hummingbird logo detect (Mr. Sunil Agarwal.pdf)...
+   🐦 Logo detect (Mr. Sunil Agarwal.pdf) -> logo_found=False confidence=high reason="No matching hummingbird graphic present; only plain text 'Hummingbird Digital Pvt Ltd' appears in the address block and "
+   ✅ Loaded classify single prompt (B) from /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/prompts/classify_single_prompt.txt (4363 chars)
+   🔎 Classifying single-page invoice Mr. Sunil Agarwal.pdf (Prompt B)...
+   ✅ Extracted structured data from Mr. Sunil Agarwal.pdf
+   🔍 Raw GST from GPT (spatial rules in prompt; not re-bucketed by 5874):
+      Raw HBD GST (customer/Bill To): '37AABCH5874R2ZP'
+      Raw Client GST (hotel header): '37AAHCV8308G1Z2'
+   ✅ HBD GST '37AABCH5874R2ZP' passed GSTIN validation
+   ✅ Client GST (hotel) '37AAHCV8308G1Z2' passed GSTIN validation
+   ✅ Final GST (validated; prompt roles preserved):
+      📋 HBD GST (customer/Bill To): 37AABCH5874R2ZP
+      📋 Client GST (hotel): 37AAHCV8308G1Z2
+   🔍 Attempting to match PDF guest name 'Mr. Sunil Agarwal' with 2 email table entry/entries...
+      🔍 Entry 1: Guest name score = 37/100 ('Rajeev Ranjan Sinha' vs 'Mr. Sunil Agarwal')
+      ❌ Entry 1: Guest name score 37 <= 60 threshold ('Rajeev Ranjan Sinha' vs 'Mr. Sunil Agarwal')
+      🔍 Entry 2: Guest name score = 100/100 ('Sunil Kumar Agarwal' vs 'Mr. Sunil Agarwal')
+      📅 Entry 2: Check-in match = True (Email: '08/09/2026' vs PDF: '08/09/26')
+      📅 Entry 2: Check-out match = True (Email: '09/09/2026' vs PDF: '09/09/26')
+   ✅ Guest+date match found! PDF 1 matches table entry 2/2:
+      Email: 'Sunil Kumar Agarwal' ↔ PDF: 'Mr. Sunil Agarwal'
+      Booking Code: 1313493
+   ✅ Found 1 match(es) for PDF 1
+   🔄 Found 1 match(es) - will create 1 MySQL row(s) with different booking codes
+   📋 PDF DATA (will be used for all matches):
+      Hotel Name: Taj Tirupati
+      Guest Name: Mr. Sunil Agarwal
+      Bill Number: 212639795
+      Bill Date: 09/09/2026
+      Check-in Date: 08/09/26
+      Check-out Date: 09/09/26
+      Total Amount: 14,738.20
+      HBD GST Number: 37AABCH5874R2ZP
+      Client GST Number: 37AAHCV8308G1Z2
+      Match 1: Booking Code = 1313493, Score = 100
+   📄 Analyzing PDF: Mr. Rajeev Ranjan Sinha.pdf
+   📄 Processing PDF Mr. Rajeev Ranjan Sinha.pdf using image-based extraction 
+   📤 Uploading 1 image(s) to Azure Blob Storage...
+      ✅ Uploaded: tmpnr0067gj_0.jpg -> https://hbbills.blob.core.windows.net/bill/temp_im...
+   📄 Reusing 1 uploaded page image(s) for Mr. Rajeev Ranjan Sinha.pdf
+   ⏳ Waiting 2 seconds for image URLs to propagate...
+   🔍 Verifying image URL accessibility...
+      ✅ Image 1 URL is accessible
+   ✅ Successfully loaded prompt from /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/prompts/prompt.txt (23993 chars)
+   🔄 Extracting structured data using gpt-5-mini...
+      ⏳ Waiting 3 seconds before first API call to ensure URLs are ready...
+      🔍 Using max_completion_tokens: 8000 (attempt 1)
+      🔍 DEBUG: Checking for content filtering...
+         ⚠️  PROMPT FILTERING: [{'prompt_index': 0, 'content_filter_results': {'hate': {'filtered': False, 'severity': 'safe'}, 'jailbreak': {'detected': False, 'filtered': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}}}]
+         ⚠️  CHOICE FILTERING: {'hate': {'filtered': False, 'severity': 'safe'}, 'protected_material_code': {'detected': False, 'filtered': False}, 'protected_material_text': {'detected': False, 'filtered': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}}
+         Finish reason: stop
+         ⚠️  MESSAGE REFUSAL: None
+   📄 GPT output preview (first 500 chars):
+      [Extracted Text]
+TAJ
+TIRUPATI
+
+COPY OF INVOICE                     INVOICE
+GST ID                : 37AABCH5874R2ZP
+E-Commerce ID
+Hummingbird Digital Pvt Ltd
+Basement Flr 12-1-22                  Invoice No.   : 212639794    Date       : 09-09-26
+Kannayypeta Rd                        Page          : 1 of 1        Reverse Charge : No
+Nr Hotel Green Park                   Rate Code     : R04           Segment        : RAC
+Visakhapatnam AP 530002               Rate          : 12490 INR     Package  ...
+      ✅ Total CGST extracted: 1124.10
+      ✅ Total SGST extracted: 1124.10
+      ✅ room_charge extracted: 12490.00
+      ✅ total_igst extracted: 0.00
+   🔍 Parsed data from GPT output for Mr. Rajeev Ranjan Sinha.pdf:
+      Guest Name: 'Mr. Rajeev Ranjan Sinha'
+      Hotel Name: 'TAJ TIRUPATI'
+      HBD GST: '37AABCH5874R2ZP'
+      Client GST: '37AAHCV8308G1Z2'
+      Bill Number: '212639794'
+      CGST Number: ''
+      SGST Number: ''
+      Total CGST: '1124.10'
+      Total SGST: '1124.10'
+      Room Charge: '12490.00'
+      Total Tariff: ''
+      Other Charges: ''
+      Total IGST: '0.00'
+      Total Taxes: ''
+      Discount: ''
+      Advance Received: ''
+   🐦 Hummingbird logo detect (Mr. Rajeev Ranjan Sinha.pdf)...
+   🐦 Logo detect (Mr. Rajeev Ranjan Sinha.pdf) -> logo_found=False confidence=high reason="Invoice shows the TAJ letterhead and plain text 'Hummingbird Digital Pvt Ltd' as the travel agent, but the hummingbird g"
+   ✅ Loaded classify single prompt (B) from /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/prompts/classify_single_prompt.txt (4363 chars)
+   🔎 Classifying single-page invoice Mr. Rajeev Ranjan Sinha.pdf (Prompt B)...
+   ✅ Extracted structured data from Mr. Rajeev Ranjan Sinha.pdf
+   🔍 Raw GST from GPT (spatial rules in prompt; not re-bucketed by 5874):
+      Raw HBD GST (customer/Bill To): '37AABCH5874R2ZP'
+      Raw Client GST (hotel header): '37AAHCV8308G1Z2'
+   ✅ HBD GST '37AABCH5874R2ZP' passed GSTIN validation
+   ✅ Client GST (hotel) '37AAHCV8308G1Z2' passed GSTIN validation
+   ✅ Final GST (validated; prompt roles preserved):
+      📋 HBD GST (customer/Bill To): 37AABCH5874R2ZP
+      📋 Client GST (hotel): 37AAHCV8308G1Z2
+   🔍 Attempting to match PDF guest name 'Mr. Rajeev Ranjan Sinha' with 2 email table entry/entries...
+      🔍 Entry 1: Guest name score = 100/100 ('Rajeev Ranjan Sinha' vs 'Mr. Rajeev Ranjan Sinha')
+      📅 Entry 1: Check-in match = True (Email: '08/09/2026' vs PDF: '08/09/26')
+      📅 Entry 1: Check-out match = True (Email: '09/09/2026' vs PDF: '09/09/26')
+   ✅ Guest+date match found! PDF 2 matches table entry 1/2:
+      Email: 'Rajeev Ranjan Sinha' ↔ PDF: 'Mr. Rajeev Ranjan Sinha'
+      Booking Code: 1313492
+      🔍 Entry 2: Guest name score = 36/100 ('Sunil Kumar Agarwal' vs 'Mr. Rajeev Ranjan Sinha')
+      ❌ Entry 2: Guest name score 36 <= 60 threshold ('Sunil Kumar Agarwal' vs 'Mr. Rajeev Ranjan Sinha')
+   ✅ Found 1 match(es) for PDF 2
+   🔄 Found 1 match(es) - will create 1 MySQL row(s) with different booking codes
+   📋 PDF DATA (will be used for all matches):
+      Hotel Name: Taj Tirupati
+      Guest Name: Mr. Rajeev Ranjan Sinha
+      Bill Number: 212639794
+      Bill Date: 09/09/2026
+      Check-in Date: 08/09/26
+      Check-out Date: 09/09/26
+      Total Amount: 14,738.20
+      HBD GST Number: 37AABCH5874R2ZP
+      Client GST Number: 37AAHCV8308G1Z2
+      Match 1: Booking Code = 1313492, Score = 100
+   📄 Processing 2 PDF(s) with email data
+   🏨 Property name from email table: Taj Tirupati
+   🔍 Looking for vendor: 'Taj Tirupati'
+   ❌ No exact match found for: 'Taj Tirupati'
+   🏨 Extracted vendor: Taj Tirupati
+   📁 Assigned to: UNASSIGNED
+   🔧 DEBUG: assigned_column type: <class 'str'>, value: 'UNASSIGNED'
+   💰 Amounts found: [1.1, 2.0, 1.0, 3.0, 517.0, 4.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 6.0, 20.0, 23.0, 30.0, 37.0, 51.0, 440.0, 91.0, 503.0]
+   ⚡ Urgency: URGENT
+   🔧 DEBUG: assigned_column='UNASSIGNED', folder_prefix='UNASSIGNED'
+   📄 Original filename: Mr. Sunil Agarwal.pdf
+Uploading PDF bytes (300430 bytes) to blob storage as UNASSIGNED/2026-11-13_13:49_Mr.-Sunil-Agarwal.pdf...
+Successfully uploaded PDF to: https://hbbills.blob.core.windows.net/bill/UNASSIGNED/2026-11-13_13:49_Mr.-Sunil-Agarwal.pdf
+   ☁️  Uploaded PDF to Blob Storage: UNASSIGNED/Mr. Sunil Agarwal.pdf
+   💾 Uploaded PDF 1: Mr. Sunil Agarwal.pdf
+   🔧 DEBUG: assigned_column='UNASSIGNED', folder_prefix='UNASSIGNED'
+   📄 Original filename: Mr. Rajeev Ranjan Sinha.pdf
+Uploading PDF bytes (300419 bytes) to blob storage as UNASSIGNED/2026-11-13_13:49_Mr.-Rajeev-Ranjan-Sinha.pdf...
+Successfully uploaded PDF to: https://hbbills.blob.core.windows.net/bill/UNASSIGNED/2026-11-13_13:49_Mr.-Rajeev-Ranjan-Sinha.pdf
+   ☁️  Uploaded PDF to Blob Storage: UNASSIGNED/Mr. Rajeev Ranjan Sinha.pdf
+   💾 Uploaded PDF 2: Mr. Rajeev Ranjan Sinha.pdf
+   ✅ Uploaded 2 PDF(s) to Blob Storage: UNASSIGNED folder
+
+   📊 Saving invoice data to MySQL...
+📊 Ensuring MySQL invoice table exists...
+✓ Invoice data table verified/created
+📊 Master Excel disabled - saving to MySQL only
+📊 Processing 1 invoice(s) for MySQL insertion...
+   📄 Processing invoice 1/1...
+   Multi Page PDF: Mr. Sunil Agarwal.pdf -> no
+   📋 PDF pdf_1 matched to 1 email table entry/entries - creating 1 MySQL row(s)
+   📝 SAVING TO MYSQL (Match 1/1 - PDF matched to email table entry 2) for 20261113_Mr._Sunil_Agarwal.pdf:
+      Hotel Name: Taj Tirupati
+      Guest Name: Mr. Sunil Agarwal
+      Booking Code: 1313493 (from email entry 2)
+      Email Amount: 14738
+   📋 MySQL row — new extracted fields:
+      room_charge: 12490.0
+      total_tariff: None
+      other_charges: None
+      total_igst: 0.0
+      total_taxes: None
+      discount: None
+      advance_received: None
+   ✅ Inserted row to MySQL database (ID: 5, S.No: None)
+   ✅ Successfully saved to MySQL
+   Multi Page PDF: Mr. Rajeev Ranjan Sinha.pdf -> no
+   📋 PDF pdf_2 matched to 1 email table entry/entries - creating 1 MySQL row(s)
+   📝 SAVING TO MYSQL (Match 1/1 - PDF matched to email table entry 1) for 20261113_Mr._Rajeev_Ranjan_Sinha.pdf:
+      Hotel Name: Taj Tirupati
+      Guest Name: Mr. Rajeev Ranjan Sinha
+      Booking Code: 1313492 (from email entry 1)
+      Email Amount: 14738
+   📋 MySQL row — new extracted fields:
+      room_charge: 12490.0
+      total_tariff: None
+      other_charges: None
+      total_igst: 0.0
+      total_taxes: None
+      discount: None
+      advance_received: None
+   ✅ Inserted row to MySQL database (ID: 6, S.No: None)
+   ✅ Successfully saved to MySQL
+📊 Summary: 2 row(s) were processed - MySQL insertion was attempted for each row above
+✅ All invoice data saved to MySQL (Master Excel disabled)
+   ✅ Invoice data saved to MySQL (2 row(s))
+
+📨 Processing email 3/294 (2026-09-14)
+   From: HummingBird <noreply@hummingbirdindia.com>
+   Subject: Hotel direct invoice upload statement for the day of 13 Sep 2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 4/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 5/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 6/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 7/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 8/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 9/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 10/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 11/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 12/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 13/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 14/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 15/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 16/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 17/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 18/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment(PA) statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 19/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 20/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 21/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 22/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 23/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 24/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 25/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 26/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 27/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 28/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 29/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 30/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 31/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 32/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 33/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 34/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 35/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 36/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 37/294 (2026-09-14)
+   From: ReservationPPKOL <stay.ppkol@chocolatehotels.in>
+   Subject: Re: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 38/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 39/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 13/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 40/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 41/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 42/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 43/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 44/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 45/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 46/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 47/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 48/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 49/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 50/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 51/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 52/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 53/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 54/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 55/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 56/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 57/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 58/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 59/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 60/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 61/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 62/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 63/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 64/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 65/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 66/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 67/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 68/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 69/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 12/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 70/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 71/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 72/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 73/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 74/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 75/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 76/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 77/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 78/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 79/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 80/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 81/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 82/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 83/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 13/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 84/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 85/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 86/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 87/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 88/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 89/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 90/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 91/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 92/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 93/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 94/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 95/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 96/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 97/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 98/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 99/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 100/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+======================================================================
+🔄 STEP-7: 2026-09-14: every 100 emails processed
+======================================================================
+======================================================================
+STEP7 FLOW (MySQL required) + API EXCEL FROM test1.py
+======================================================================
+1) Load unpushed MySQL rows (skip when none)
+2) Generate API Excel via test1.py and match extracted rows
+3) Fill status/flags/remarks/amount_match/amount_difference
+4) Save updated extracted Excel (invoice report)
+5) Optionally push matched rows to API
+======================================================================
+✓ Invoice data table verified/created
+✅ MySQL engine initialized — match results will be saved to DB
+
+   📊 Reading MySQL invoice_report table for data merging...
+      🔍 Filtering: only rows with pushed_at=0 or NULL (unpushed)
+      ✅ Read 2 rows from MySQL invoice_report table
+      📋 MySQL columns: ['id', 'created_at', 's_no', 'processing_date', 'email_from', 'message_id', 'email_date', 'assigned_to', 'hotel_name', 'guest_name', 'booking_code', 'bill_number', 'bill_date', 'check_in_date', 'check_out_date', 'amount_paid', 'email_amount', 'hbd_gst_number', 'client_gst_number', 'validation_flag', 'cgst_number', 'sgst_number', 'total_cgst', 'total_sgst', 'pdf_filename', 'blob_url', 'matched_status', 'excel_match_guest_score', 'excel_match_checkin_delta', 'excel_match_checkout_delta', 'match_booking_code', 'hbd_gst_match', 'client_gst_match', 'remarks', 'updated_at', 'push_failed', 'push_cancelled', 'multi_page_pdf', 'amount_match', 'amount_difference', 'room_charge', 'total_tariff', 'other_charges', 'total_igst', 'total_taxes', 'discount', 'advance_received', 'room_captured', 'pushed_at', 'flag', 'mmt_flag']
+      ✅ Mapped MySQL columns to Excel format
+      📋 Excel columns: ['Created At', 'Processing Date', 'Email From', 'Email Date', 'Assigned To', 'Hotel Name', 'Guest Name', 'Booking Code', 'Bill Number', 'Bill Date', 'Check-in Date', 'Check-out Date', 'Amount Paid', 'Email Amount', 'HBD GST Number', 'Client GST Number', 'Validation Flag', 'CGST Number', 'SGST Number', 'Total CGST', 'Total SGST', 'PDF Filename', 'Blob URL', 'Push Failed', 'Push Cancelled', 'Multi Page PDF', 'Room Charge', 'Total Tariff', 'Other Charges', 'Total IGST', 'Total Taxes', 'Discount', 'Advance Received', 'Room Captured', 'flag']
+
+📥 Generating API Excel from test1.py ...
+Fetching data from: https://hbinvoiceapi.staysimplyfied.com/api/HotelInvoice/Unmappedinvoicedata
+Fetching all pages...
+Fetching page 1... ✓ Found 250 records (Total: 250)
+Fetching page 2... ✓ Found 250 records (Total: 500)
+Fetching page 3... ✓ Found 250 records (Total: 750)
+Fetching page 4... ✓ Found 250 records (Total: 1000)
+Fetching page 5... ✓ Found 250 records (Total: 1250)
+Fetching page 6... ✓ Found 250 records (Total: 1500)
+Fetching page 7... ✓ Found 250 records (Total: 1750)
+Fetching page 8... ✓ Found 250 records (Total: 2000)
+Fetching page 9... ✓ Found 250 records (Total: 2250)
+Fetching page 10... ✓ Found 250 records (Total: 2500)
+Fetching page 11... ✓ Found 250 records (Total: 2750)
+Fetching page 12... ✓ Found 250 records (Total: 3000)
+Fetching page 13... ✓ Found 250 records (Total: 3250)
+Fetching page 14... ✓ Found 250 records (Total: 3500)
+Fetching page 15... ✓ Found 250 records (Total: 3750)
+Fetching page 16... ✓ Found 250 records (Total: 4000)
+Fetching page 17... ✓ Found 250 records (Total: 4250)
+Fetching page 18... ✓ Found 250 records (Total: 4500)
+Fetching page 19... ✓ Found 250 records (Total: 4750)
+Fetching page 20... ✓ Found 250 records (Total: 5000)
+Fetching page 21... ✓ Found 250 records (Total: 5250)
+Fetching page 22... ✓ Found 250 records (Total: 5500)
+Fetching page 23... ✓ Found 250 records (Total: 5750)
+Fetching page 24... ✓ Found 250 records (Total: 6000)
+Fetching page 25... ✓ Found 250 records (Total: 6250)
+Fetching page 26... ✓ Found 250 records (Total: 6500)
+Fetching page 27... ✓ Found 250 records (Total: 6750)
+Fetching page 28... ✓ Found 250 records (Total: 7000)
+Fetching page 29... ✓ Found 250 records (Total: 7250)
+Fetching page 30... ✓ Found 250 records (Total: 7500)
+Fetching page 31... ✓ Found 250 records (Total: 7750)
+Fetching page 32... ✓ Found 250 records (Total: 8000)
+Fetching page 33... ✓ Found 250 records (Total: 8250)
+Fetching page 34... ✓ Found 250 records (Total: 8500)
+Fetching page 35... ✓ Found 250 records (Total: 8750)
+Fetching page 36... ✓ Found 250 records (Total: 9000)
+Fetching page 37... ✓ Found 250 records (Total: 9250)
+Fetching page 38... ✓ Found 250 records (Total: 9500)
+Fetching page 39... ✓ Found 250 records (Total: 9750)
+Fetching page 40... ✓ Found 250 records (Total: 10000)
+Fetching page 41... ✓ Found 250 records (Total: 10250)
+Fetching page 42... ✓ Found 250 records (Total: 10500)
+Fetching page 43... ✓ Found 250 records (Total: 10750)
+Fetching page 44... ✓ Found 250 records (Total: 11000)
+Fetching page 45... ✓ Found 250 records (Total: 11250)
+Fetching page 46... ✓ Found 250 records (Total: 11500)
+Fetching page 47... ✓ Found 250 records (Total: 11750)
+Fetching page 48... ✓ Found 250 records (Total: 12000)
+Fetching page 49... ✓ Found 250 records (Total: 12250)
+Fetching page 50... ✓ Found 250 records (Total: 12500)
+Fetching page 51... ✓ Found 250 records (Total: 12750)
+Fetching page 52... ✓ Found 250 records (Total: 13000)
+Fetching page 53... ✓ Found 250 records (Total: 13250)
+Fetching page 54... ✓ Found 250 records (Total: 13500)
+Fetching page 55... ✓ Found 250 records (Total: 13750)
+Fetching page 56... ✓ Found 250 records (Total: 14000)
+Fetching page 57... ✓ Found 250 records (Total: 14250)
+Fetching page 58... ✓ Found 250 records (Total: 14500)
+Fetching page 59... ✓ Found 250 records (Total: 14750)
+Fetching page 60... ✓ Found 250 records (Total: 15000)
+Fetching page 61... ✓ Found 250 records (Total: 15250)
+Fetching page 62... ✓ Found 250 records (Total: 15500)
+Fetching page 63... ✓ Found 250 records (Total: 15750)
+Fetching page 64... ✓ Found 250 records (Total: 16000)
+Fetching page 65... ✓ Found 250 records (Total: 16250)
+Fetching page 66... ✓ Found 250 records (Total: 16500)
+Fetching page 67... ✓ Found 250 records (Total: 16750)
+Fetching page 68... ✓ Found 250 records (Total: 17000)
+Fetching page 69... ✓ Found 250 records (Total: 17250)
+Fetching page 70... ✓ Found 250 records (Total: 17500)
+Fetching page 71... ✓ Found 250 records (Total: 17750)
+Fetching page 72... ✓ Found 250 records (Total: 18000)
+Fetching page 73... ✓ Found 250 records (Total: 18250)
+Fetching page 74... ✓ Found 250 records (Total: 18500)
+Fetching page 75... ✓ Found 250 records (Total: 18750)
+Fetching page 76... ✓ Found 250 records (Total: 19000)
+Fetching page 77... ✓ Found 250 records (Total: 19250)
+Fetching page 78... ✓ Found 250 records (Total: 19500)
+Fetching page 79... ✓ Found 250 records (Total: 19750)
+Fetching page 80... ✓ Found 250 records (Total: 20000)
+Fetching page 81... ✓ Found 250 records (Total: 20250)
+Fetching page 82... ✓ Found 250 records (Total: 20500)
+Fetching page 83... ✓ Found 250 records (Total: 20750)
+Fetching page 84... ✓ Found 250 records (Total: 21000)
+Fetching page 85... ✓ Found 250 records (Total: 21250)
+Fetching page 86... ✓ Found 250 records (Total: 21500)
+Fetching page 87... ✓ Found 250 records (Total: 21750)
+Fetching page 88... ✓ Found 250 records (Total: 22000)
+Fetching page 89... ✓ Found 250 records (Total: 22250)
+Fetching page 90... ✓ Found 250 records (Total: 22500)
+Fetching page 91... ✓ Found 250 records (Total: 22750)
+Fetching page 92... ✓ Found 250 records (Total: 23000)
+Fetching page 93... ✓ Found 250 records (Total: 23250)
+Fetching page 94... ✓ Found 250 records (Total: 23500)
+Fetching page 95... ✓ Found 250 records (Total: 23750)
+Fetching page 96... ✓ Found 250 records (Total: 24000)
+Fetching page 97... ✓ Found 250 records (Total: 24250)
+Fetching page 98... ✓ Found 250 records (Total: 24500)
+Fetching page 99... ✓ Found 250 records (Total: 24750)
+Fetching page 100... ✓ Found 250 records (Total: 25000)
+Fetching page 101... ✓ Found 250 records (Total: 25250)
+Fetching page 102... ✓ Found 250 records (Total: 25500)
+Fetching page 103... ✓ Found 250 records (Total: 25750)
+Fetching page 104... ✓ Found 250 records (Total: 26000)
+Fetching page 105... ✓ Found 250 records (Total: 26250)
+Fetching page 106... ✓ Found 250 records (Total: 26500)
+Fetching page 107... ✓ Found 250 records (Total: 26750)
+Fetching page 108... ✓ Found 250 records (Total: 27000)
+Fetching page 109... ✓ Found 250 records (Total: 27250)
+Fetching page 110... ✓ Found 250 records (Total: 27500)
+Fetching page 111... ✓ Found 250 records (Total: 27750)
+Fetching page 112... ✓ Found 250 records (Total: 28000)
+Fetching page 113... ✓ Found 250 records (Total: 28250)
+Fetching page 114... ✓ Found 250 records (Total: 28500)
+Fetching page 115... ✓ Found 250 records (Total: 28750)
+Fetching page 116... ✓ Found 250 records (Total: 29000)
+Fetching page 117... ✓ Found 250 records (Total: 29250)
+Fetching page 118... ✓ Found 250 records (Total: 29500)
+Fetching page 119... ✓ Found 250 records (Total: 29750)
+Fetching page 120... ✓ Found 250 records (Total: 30000)
+Fetching page 121... ✓ Found 250 records (Total: 30250)
+Fetching page 122... ✓ Found 250 records (Total: 30500)
+Fetching page 123... ✓ Found 250 records (Total: 30750)
+Fetching page 124... ✓ Found 250 records (Total: 31000)
+Fetching page 125... ✓ Found 250 records (Total: 31250)
+Fetching page 126... ✓ Found 250 records (Total: 31500)
+Fetching page 127... ✓ Found 250 records (Total: 31750)
+Fetching page 128... ✓ Found 250 records (Total: 32000)
+Fetching page 129... ✓ Found 250 records (Total: 32250)
+Fetching page 130... ✓ Found 250 records (Total: 32500)
+Fetching page 131... ✓ Found 250 records (Total: 32750)
+Fetching page 132... ✓ Found 250 records (Total: 33000)
+Fetching page 133... ✓ Found 250 records (Total: 33250)
+Fetching page 134... ✓ Found 250 records (Total: 33500)
+Fetching page 135... ✓ Found 250 records (Total: 33750)
+Fetching page 136... ✓ Found 250 records (Total: 34000)
+Fetching page 137... ✓ Found 250 records (Total: 34250)
+Fetching page 138... ✓ Found 250 records (Total: 34500)
+Fetching page 139... ✓ Found 250 records (Total: 34750)
+Fetching page 140... ✓ Found 250 records (Total: 35000)
+Fetching page 141... ✓ Found 250 records (Total: 35250)
+Fetching page 142... ✓ Found 250 records (Total: 35500)
+Fetching page 143... ✓ Found 250 records (Total: 35750)
+Fetching page 144... ✓ Found 250 records (Total: 36000)
+Fetching page 145... ✓ Found 250 records (Total: 36250)
+Fetching page 146... ✓ Found 250 records (Total: 36500)
+Fetching page 147... ✓ Found 250 records (Total: 36750)
+Fetching page 148... ✓ Found 250 records (Total: 37000)
+Fetching page 149... ✓ Found 250 records (Total: 37250)
+Fetching page 150... ✓ Found 250 records (Total: 37500)
+Fetching page 151... ✓ Found 250 records (Total: 37750)
+Fetching page 152... ✓ Found 250 records (Total: 38000)
+Fetching page 153... ✓ Found 250 records (Total: 38250)
+Fetching page 154... ✓ Found 250 records (Total: 38500)
+Fetching page 155... ✓ Found 250 records (Total: 38750)
+Fetching page 156... ✓ Found 250 records (Total: 39000)
+Fetching page 157... ✓ Found 250 records (Total: 39250)
+Fetching page 158... ✓ Found 250 records (Total: 39500)
+Fetching page 159... ✓ Found 250 records (Total: 39750)
+Fetching page 160... ✓ Found 250 records (Total: 40000)
+Fetching page 161... ✓ Found 250 records (Total: 40250)
+Fetching page 162... ✓ Found 250 records (Total: 40500)
+Fetching page 163... ✓ Found 250 records (Total: 40750)
+Fetching page 164... ✓ Found 250 records (Total: 41000)
+Fetching page 165... ✓ Found 250 records (Total: 41250)
+Fetching page 166... ✓ Found 250 records (Total: 41500)
+Fetching page 167... ✓ Found 250 records (Total: 41750)
+Fetching page 168... ✓ Found 250 records (Total: 42000)
+Fetching page 169... ✓ Found 250 records (Total: 42250)
+Fetching page 170... ✓ Found 250 records (Total: 42500)
+Fetching page 171... ✓ Found 250 records (Total: 42750)
+Fetching page 172... ✓ Found 250 records (Total: 43000)
+Fetching page 173... ✓ Found 250 records (Total: 43250)
+Fetching page 174... ✓ Found 250 records (Total: 43500)
+Fetching page 175... ✓ Found 250 records (Total: 43750)
+Fetching page 176... ✓ Found 250 records (Total: 44000)
+Fetching page 177... ✓ Found 250 records (Total: 44250)
+Fetching page 178... ✓ Found 250 records (Total: 44500)
+Fetching page 179... ✓ Found 250 records (Total: 44750)
+Fetching page 180... ✓ Found 250 records (Total: 45000)
+Fetching page 181... ✓ Found 250 records (Total: 45250)
+Fetching page 182... ✓ Found 250 records (Total: 45500)
+Fetching page 183... ✓ Found 250 records (Total: 45750)
+Fetching page 184... ✓ Found 250 records (Total: 46000)
+Fetching page 185... ✓ Found 250 records (Total: 46250)
+Fetching page 186... ✓ Found 250 records (Total: 46500)
+Fetching page 187... ✓ Found 250 records (Total: 46750)
+Fetching page 188... ✓ Found 250 records (Total: 47000)
+Fetching page 189... ✓ Found 250 records (Total: 47250)
+Fetching page 190... ✓ Found 250 records (Total: 47500)
+Fetching page 191... ✓ Found 250 records (Total: 47750)
+Fetching page 192... ✓ Found 250 records (Total: 48000)
+Fetching page 193... ✓ Found 250 records (Total: 48250)
+Fetching page 194... ✓ Found 243 records (Total: 48493)
+Fetching page 195... ✓ No more data
+
+Successfully fetched 48493 total records from 194 page(s)
+Found 48493 booking records
+Data successfully exported to api/booking_data_20261113_135214.xlsx
+Total records exported: 48493
+Full file path: /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/api/booking_data_20261113_135214.xlsx
+
+============================================================
+Process completed successfully!
+Excel file created: booking_data_20261113_135214.xlsx
+File location: /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/api/booking_data_20261113_135214.xlsx
+============================================================
+✅ Generated API Excel: /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/api/booking_data_20261113_135214.xlsx
+
+🔎 Building bill_number duplicate index from MySQL (all rows)...
+   ✅ Indexed 2 distinct bill number(s)
+
+----------------------------------------------------------------------
+🔎 Matching extracted row 1 | row ID 5 | Booking Code='1313493' | Guest='Mr. Sunil Agarwal' | CheckIn='08/09/26' | CheckOut='09/09/26'
+   🔍 Matching by GST Numbers + Guest Name + (Check-In OR Check-Out Date ±1 day):
+      HBD GST: '37AABCH5874R2ZP'
+      Client GST: '37AAHCV8308G1Z2'
+      Guest Name: 'Mr. Sunil Agarwal'
+      Check-In Date: '08/09/26'
+      Check-Out Date: '09/09/26'
+      💡 Using advanced guest name matching logic (same as merge)
+   ❌ No matching row found. Debugging match conditions...
+      📊 Condition breakdown:
+         HBD GST matches: 2301 row(s)
+         Client GST matches: 3 row(s)
+         Guest Name matches: 379 row(s)
+         Check-In Date matches (±1 day): 571 row(s)
+         Check-Out Date matches (±1 day): 458 row(s)
+         Either date matches (±1 day): 648 row(s)
+❌ No API match found for this extracted row.
+   ✅ Updated matched_status to 'unmatched' for row ID 5 (1 row(s))
+
+----------------------------------------------------------------------
+🔎 Matching extracted row 2 | row ID 6 | Booking Code='1313492' | Guest='Mr. Rajeev Ranjan Sinha' | CheckIn='08/09/26' | CheckOut='09/09/26'
+   🔍 Matching by GST Numbers + Guest Name + (Check-In OR Check-Out Date ±1 day):
+      HBD GST: '37AABCH5874R2ZP'
+      Client GST: '37AAHCV8308G1Z2'
+      Guest Name: 'Mr. Rajeev Ranjan Sinha'
+      Check-In Date: '08/09/26'
+      Check-Out Date: '09/09/26'
+      💡 Using advanced guest name matching logic (same as merge)
+   ❌ No matching row found. Debugging match conditions...
+      📊 Condition breakdown:
+         HBD GST matches: 2301 row(s)
+         Client GST matches: 3 row(s)
+         Guest Name matches: 357 row(s)
+         Check-In Date matches (±1 day): 571 row(s)
+         Check-Out Date matches (±1 day): 458 row(s)
+         Either date matches (±1 day): 648 row(s)
+❌ No API match found for this extracted row.
+   ✅ Updated matched_status to 'unmatched' for row ID 6 (1 row(s))
+   ⚠️  Step-7 auto-trigger failed (non-fatal): name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/backend/app/modules/ingest/service.py", line 233, in _run_step7_batch
+    step7_result = _run_step7(
+                   ^^^^^^^^^^^
+  File "/home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/backend/app/modules/matching/service.py", line 843, in run
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            ^^^^^^^^
+NameError: name 'datetime' is not defined. Did you forget to import 'datetime'
+
+📨 Processing email 101/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 102/294 (2026-09-14)
+   From: "RHI, Lucknow India Reservations" <Reservations.Lucknow@marriott.com>
+   Subject: RE: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 103/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 104/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 105/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 106/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 107/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 108/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 109/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 110/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 111/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 112/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 113/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment(PA) statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 114/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 115/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 116/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 117/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 118/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 119/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 120/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 121/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 122/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 123/294 (2026-09-14)
+   From: HummingBird <hotelbooking.hb500@hummingbirdindia.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 124/294 (2026-09-14)
+   From: "Holiday Mechanic Odisha DMC Pvt. Ltd." <booking@holidaymechanic.com>
+   Subject: Invitation for World Tourism Day Celebration on 26 Sep
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 125/294 (2026-09-14)
+   From: NOVOTEL Jodhpur RE <HB9J2-RE@accor.com>
+   Subject: RE: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 126/294 (2026-09-14)
+   🔎 Detected 1 PDF(s) by content
+   From: Accounts - Hotel Heritage Mumbai <accounts@hotelheritagemumbai.com>
+   Subject: RE: ADVANCE Reservations - Hotel Heritage Mumbai <reservations@hotelheritagemumbai.com>PAYMENT INVOICE NOT RECEIVED–HUMMINGBIRD  - Hotel Heritage (formerly Known As Comfort Inn Heritage)
+   🎯 INVOICE DETECTED! (PDF attachment found)
+   🔎 Detected 1 PDF(s) by content
+   🔎 Parsing HTML tables for booking data...
+   🧾 Detected 3 HTML table(s) in email body
+        ✓ Table row parsed: {'booking_code': '1313124', 'guest_name': 'Mukesh Kumar, Amnish Kumar', 'check_in_date': '03/09/2026', 'check_out_date': '05/09/2026', 'total_amount': '13702'}
+   ✅ Parsed 1 table row(s) with potential data
+   ⚠️  Table rows found but no valid booking code parsed
+   🔄 Using OpenAI to fill missing fields for 1 table entry/entries...
+   📋 Processing table entry 1/1...
+   🤖 Using OpenAI to extract missing fields: property_name
+   ✅ OpenAI extracted email data: 3 fields found
+      • property_name: Hotel Heritage Mumbai
+      ✅ Filled property_name = 'Hotel Heritage Mumbai'
+   ✅ Copied property_name from best table entry to top-level: Hotel Heritage Mumbai
+   👤 Guest name(s) from email: Mukesh Kumar, Amnish Kumar
+   📎 Found 1 attachment(s)
+   📎 Processing 1 valid attachment(s)
+   📄 Found 1 PDF attachment(s) for analysis
+   📄 Analyzing PDF: 8033.pdf
+   📄 Processing PDF 8033.pdf using image-based extraction 
+   📤 Uploading 1 image(s) to Azure Blob Storage...
+      ✅ Uploaded: tmp2549bc0t_0.jpg -> https://hbbills.blob.core.windows.net/bill/temp_im...
+   📄 Reusing 1 uploaded page image(s) for 8033.pdf
+   ⏳ Waiting 2 seconds for image URLs to propagate...
+   🔍 Verifying image URL accessibility...
+      ✅ Image 1 URL is accessible
+   ✅ Successfully loaded prompt from /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/prompts/prompt.txt (23993 chars)
+   🔄 Extracting structured data using gpt-5-mini...
+      ⏳ Waiting 3 seconds before first API call to ensure URLs are ready...
+      🔍 Using max_completion_tokens: 8000 (attempt 1)
+      🔍 DEBUG: Checking for content filtering...
+         ⚠️  PROMPT FILTERING: [{'prompt_index': 0, 'content_filter_results': {'hate': {'filtered': False, 'severity': 'safe'}, 'jailbreak': {'detected': False, 'filtered': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}}}]
+         ⚠️  CHOICE FILTERING: {'hate': {'filtered': False, 'severity': 'safe'}, 'protected_material_code': {'detected': False, 'filtered': False}, 'protected_material_text': {'detected': False, 'filtered': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}}
+         Finish reason: stop
+         ⚠️  MESSAGE REFUSAL: None
+   📄 GPT output preview (first 500 chars):
+      [Extracted Text]
+TAX INVOICE ORIGINAL FOR RECIPIENT
+Place of Supply : Maharashtra
+State Code : 27
+
+        HOTEL
+      HERITAGE
+Unit of Hotel Mayfair Pvt. Ltd.                                                    Page 1 of 1
+
+
+Guest Name               : MR MUKESH KUMAR                       Bill Number   :8033
+                         : MR AMNISH KUMAR                       Bill Date     :05/09/26
+Company Name            : Humming Bird Digital Pvt Ltd           Room No       :711
+Company Address  ...
+      ✅ Total CGST extracted: 326.26
+      ✅ Total SGST extracted: 326.26
+      ✅ room_charge extracted: 13050.00
+   🔍 Parsed data from GPT output for 8033.pdf:
+      Guest Name: 'MR MUKESH KUMAR; MR AMNISH KUMAR'
+      Hotel Name: 'HOTEL HERITAGE'
+      HBD GST: '27AABCH5874R1ZR'
+      Client GST: '27AAACH1782P1ZS'
+      Bill Number: '8033'
+      CGST Number: ''
+      SGST Number: ''
+      Total CGST: '326.26'
+      Total SGST: '326.26'
+      Room Charge: '13050.00'
+      Total Tariff: ''
+      Other Charges: ''
+      Total IGST: ''
+      Total Taxes: ''
+      Discount: ''
+      Advance Received: ''
+   🐦 Hummingbird logo detect (8033.pdf)...
+   🐦 Logo detect (8033.pdf) -> logo_found=False confidence=high reason="Top-center shows the Hotel Heritage logo; the invoice only contains the typed name 'Humming Bird Digital Pvt Ltd' under "
+   ✅ Loaded classify single prompt (B) from /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/prompts/classify_single_prompt.txt (4363 chars)
+   🔎 Classifying single-page invoice 8033.pdf (Prompt B)...
+   ✅ Extracted structured data from 8033.pdf
+   🔍 Raw GST from GPT (spatial rules in prompt; not re-bucketed by 5874):
+      Raw HBD GST (customer/Bill To): '27AABCH5874R1ZR'
+      Raw Client GST (hotel header): '27AAACH1782P1ZS'
+   ✅ HBD GST '27AABCH5874R1ZR' passed GSTIN validation
+   ✅ Client GST (hotel) '27AAACH1782P1ZS' passed GSTIN validation
+   ✅ Final GST (validated; prompt roles preserved):
+      📋 HBD GST (customer/Bill To): 27AABCH5874R1ZR
+      📋 Client GST (hotel): 27AAACH1782P1ZS
+   🔍 Attempting to match PDF guest name 'MR MUKESH KUMAR; MR AMNISH KUMAR' with 1 email table entry/entries...
+      🔍 Entry 1: Guest name score = 90/100 ('Mukesh Kumar, Amnish Kumar' vs 'MR MUKESH KUMAR; MR AMNISH KUMAR')
+      📅 Entry 1: Check-in match = True (Email: '03/09/2026' vs PDF: '03/09/26')
+      📅 Entry 1: Check-out match = True (Email: '05/09/2026' vs PDF: '05/09/26')
+   ✅ Guest+date match found! PDF 1 matches table entry 1/1:
+      Email: 'Mukesh Kumar, Amnish Kumar' ↔ PDF: 'MR MUKESH KUMAR; MR AMNISH KUMAR'
+      Booking Code: 1313124
+   ✅ Found 1 match(es) for PDF 1
+   🔄 Found 1 match(es) - will create 1 MySQL row(s) with different booking codes
+   📋 PDF DATA (will be used for all matches):
+      Hotel Name: Hotel Heritage Mumbai
+      Guest Name: MR MUKESH KUMAR; MR AMNISH KUMAR
+      Bill Number: 8033
+      Bill Date: 05/09/2026
+      Check-in Date: 03/09/26
+      Check-out Date: 05/09/26
+      Total Amount: 13,702.52
+      HBD GST Number: 27AABCH5874R1ZR
+      Client GST Number: 27AAACH1782P1ZS
+      Match 1: Booking Code = 1313124, Score = 90
+   📄 Processing 1 PDF(s) with email data
+   🏨 Property name from email table: Hotel Heritage Mumbai
+   🔍 Looking for vendor: 'Hotel Heritage Mumbai'
+   ❌ No exact match found for: 'Hotel Heritage Mumbai'
+   🏨 Extracted vendor: Hotel Heritage Mumbai
+   📁 Assigned to: UNASSIGNED
+   🔧 DEBUG: assigned_column type: <class 'str'>, value: 'UNASSIGNED'
+   💰 Amounts found: [1.0, 2.0, 3.0, 900.0, 5.0, 6.0, 4.0, 8.0, 9.0, 10.0, 13.0, 80.0, 400.0, 785.0, 20.0, 22.0, 27.0]
+   ⚡ Urgency: URGENT
+   🔧 DEBUG: assigned_column='UNASSIGNED', folder_prefix='UNASSIGNED'
+   📄 Original filename: 8033.pdf
+Uploading PDF bytes (143561 bytes) to blob storage as UNASSIGNED/2026-11-13_13:55_8033.pdf...
+Successfully uploaded PDF to: https://hbbills.blob.core.windows.net/bill/UNASSIGNED/2026-11-13_13:55_8033.pdf
+   ☁️  Uploaded PDF to Blob Storage: UNASSIGNED/8033.pdf
+   💾 Uploaded PDF 1: 8033.pdf
+   ✅ Uploaded 1 PDF(s) to Blob Storage: UNASSIGNED folder
+
+   📊 Saving invoice data to MySQL...
+📊 Ensuring MySQL invoice table exists...
+✓ Invoice data table verified/created
+📊 Master Excel disabled - saving to MySQL only
+📊 Processing 1 invoice(s) for MySQL insertion...
+   📄 Processing invoice 1/1...
+   Multi Page PDF: 8033.pdf -> no
+   📋 PDF pdf_1 matched to 1 email table entry/entries - creating 1 MySQL row(s)
+   📝 SAVING TO MYSQL (Match 1/1 - PDF matched to email table entry 1) for 20261113_8033.pdf:
+      Hotel Name: Hotel Heritage Mumbai
+      Guest Name: MR MUKESH KUMAR; MR AMNISH KUMAR
+      Booking Code: 1313124 (from email entry 1)
+      Email Amount: 13702
+   📋 MySQL row — new extracted fields:
+      room_charge: 13050.0
+      total_tariff: None
+      other_charges: None
+      total_igst: None
+      total_taxes: None
+      discount: None
+      advance_received: None
+   ✅ Inserted row to MySQL database (ID: 7, S.No: None)
+   ✅ Successfully saved to MySQL
+📊 Summary: 1 row(s) were processed - MySQL insertion was attempted for each row above
+✅ All invoice data saved to MySQL (Master Excel disabled)
+   ✅ Invoice data saved to MySQL (1 row(s))
+
+📨 Processing email 127/294 (2026-09-14)
+   From: NOVOTEL Guwahati GS Road RE <H9581-RE@accor.com>
+   Subject: RE: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 128/294 (2026-09-14)
+   From: Reservations <Reservations@itchotels.com>
+   Subject: Re: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 129/294 (2026-09-14)
+   From: "Reservations Pride Elite Phaltan" <reservations.phaltan@prideelite.in>
+   Subject: RE: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 130/294 (2026-09-14)
+   From: Mail Delivery Subsystem <mailer-daemon@googlemail.com>
+   Subject: Delivery Status Notification (Delay)
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 131/294 (2026-09-14)
+   From: Fortune Landmark Ahmedabad Reservations <reservations.fla@fortunehotels.in>
+   Subject: Re: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 132/294 (2026-09-14)
+   🔎 Detected 1 PDF(s) by content
+   From: Credits Vivanta <credits.vivanta@tajhotels.com>
+   Subject: RE: Advance payment statement for the day of 11/09/2026
+   🎯 INVOICE DETECTED! (PDF attachment found)
+   🔎 Detected 1 PDF(s) by content
+   🔎 Parsing HTML tables for booking data...
+   🧾 Detected 3 HTML table(s) in email body
+        🏨 Detected property name in table cell: Hotel Ref No
+   ⚠️  No booking-relevant tables detected in HTML body
+   🔄 No table entries found - using OpenAI to extract ALL booking entries from email...
+   🤖 Using OpenAI to extract ALL booking entries from email...
+   ✅ OpenAI extracted 1 booking entry/entries from email
+      Entry 1:
+         • guest_name: H B MANISH
+         • property_name: Vivanta Ernakulam
+         • check_in_date: 08/09/2026
+         • check_out_date: 12/09/2026
+         • total_amount: 22052.00
+   ✅ Copied property_name from OpenAI extracted entry to top-level: Vivanta Ernakulam
+   ✅ Using 1 entry/entries extracted by OpenAI
+   ⚠️  No booking code found via HTML tables or OpenAI
+   👤 Guest name(s) from email: H B MANISH
+   📎 Found 1 attachment(s)
+   📎 Processing 1 valid attachment(s)
+   📄 Found 1 PDF attachment(s) for analysis
+   📄 Analyzing PDF: Invoice-201336000.pdf
+   📄 Processing PDF Invoice-201336000.pdf using image-based extraction 
+   📤 Multi-page PDF (2 pages): upload + Stage 1 detection + Stage 2 extraction
+   📤 Uploading 2 image(s) to Azure Blob Storage...
+      ✅ Uploaded: tmpzdoevs_z_0.jpg -> https://hbbills.blob.core.windows.net/bill/temp_im...
+      ✅ Uploaded: tmpzzbqw9xf_1.jpg -> https://hbbills.blob.core.windows.net/bill/temp_im...
+   ⏳ Waiting 2 seconds for image URLs to propagate...
+   ✅ Loaded classify+detect prompt (A) from /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/prompts/classify_detect_prompt.txt (6286 chars)
+   🔎 Stage 1: invoice structure detection for Invoice-201336000.pdf (2 pages)...
+   🐦 Hummingbird logo detect (Invoice-201336000.pdf segment 1 pages 1-2)...
+   🐦 Logo detect (Invoice-201336000.pdf segment 1 pages 1-2) -> logo_found=False confidence=high reason="Invoice header shows the VIVANTA hotel logo; 'HUMMINGBIRD DIGITAL PVT LTD' appears only as plain text in Customer Detail"
+   ✅ Stage 1 result: 1 invoice segment(s): [(1, 2)]
+   🏷️  Stage 1 classifications: ['b2b']
+   ✅ Successfully loaded prompt from /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/prompts/prompt.txt (23993 chars)
+   📄 Reusing 2 uploaded page image(s) for Invoice-201336000.pdf
+   🔄 Extracting structured data using gpt-5-mini...
+      ⏳ Waiting 3 seconds before first API call to ensure URLs are ready...
+      🔍 Using max_completion_tokens: 8000 (attempt 1)
+      🔍 DEBUG: Checking for content filtering...
+         ⚠️  PROMPT FILTERING: [{'prompt_index': 0, 'content_filter_results': {'hate': {'filtered': False, 'severity': 'safe'}, 'jailbreak': {'detected': False, 'filtered': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}}}]
+         ⚠️  CHOICE FILTERING: {'hate': {'filtered': False, 'severity': 'safe'}, 'protected_material_code': {'detected': False, 'filtered': False}, 'protected_material_text': {'detected': False, 'filtered': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}}
+         Finish reason: stop
+         ⚠️  MESSAGE REFUSAL: None
+   📄 GPT output preview (first 500 chars):
+      [Extracted Text]
+VIVANTA
+
+ERNAKULAM
+Marine Drive
+
+Taj Kerala Hotels & Resorts Limited
+Shanmugham Rd, Marine Drive,
+Kochi, Kerala 682011 - 682011, India
+0484 667 3300  vivanta.ernakulam@tajhotels.com
+GSTIN: 32AABCT0238M2ZH
+
+
+                          TAX INVOICE
+
+
+Customer Details
+HUMMINGBIRD DIGITAL PVT LTD
+GSTIN:        32AABCH5874R1Z0
+Address:
+Gf 392475 b1 Suitea91
+Lr Towers South Janatha Rd Palarivattom
+
+Kochi
+682025
+bills@hummingbirdindia.com
+
+Ack. No:    152627144604521                     ...
+      ✅ Total CGST extracted: 525.00
+      ✅ Total SGST extracted: 525.00
+      ✅ total_igst extracted: 0.00
+      ✅ discount extracted: 0.00
+   🔍 Parsed data from GPT output for Invoice-201336000.pdf:
+      Guest Name: 'Mr. H B Manish'
+      Hotel Name: 'VIVANTA'
+      HBD GST: '32AABCH5874R1Z0'
+      Client GST: '32AABCT0238M2ZH'
+      Bill Number: '201336000'
+      CGST Number: ''
+      SGST Number: ''
+      Total CGST: '525.00'
+      Total SGST: '525.00'
+      Room Charge: ''
+      Total Tariff: ''
+      Other Charges: ''
+      Total IGST: '0.00'
+      Total Taxes: ''
+      Discount: '0.00'
+      Advance Received: ''
+   🏷️  Classification (segment 1): b2b
+   ✅ Extracted structured data from Invoice-201336000.pdf
+   🔍 Raw GST from GPT (spatial rules in prompt; not re-bucketed by 5874):
+      Raw HBD GST (customer/Bill To): '32AABCH5874R1Z0'
+      Raw Client GST (hotel header): '32AABCT0238M2ZH'
+   ✅ HBD GST '32AABCH5874R1Z0' passed GSTIN validation
+   ✅ Client GST (hotel) '32AABCT0238M2ZH' passed GSTIN validation
+   ✅ Final GST (validated; prompt roles preserved):
+      📋 HBD GST (customer/Bill To): 32AABCH5874R1Z0
+      📋 Client GST (hotel): 32AABCT0238M2ZH
+   🔍 Attempting to match PDF guest name 'Mr. H B Manish' with 1 email table entry/entries...
+      🔍 Entry 1: Guest name score = 100/100 ('H B MANISH' vs 'Mr. H B Manish')
+      📅 Entry 1: Check-in match = True (Email: '08/09/2026' vs PDF: '08/09/26')
+      📅 Entry 1: Check-out match = True (Email: '12/09/2026' vs PDF: '12/09/26')
+   ✅ Guest+date match found! PDF 1 matches table entry 1/1:
+      Email: 'H B MANISH' ↔ PDF: 'Mr. H B Manish'
+      Booking Code: N/A
+   ✅ Found 1 match(es) for PDF 1
+   🔄 Found 1 match(es) - will create 1 MySQL row(s) with different booking codes
+   📋 PDF DATA (will be used for all matches):
+      Hotel Name: Vivanta Ernakulam
+      Guest Name: Mr. H B Manish
+      Bill Number: 201336000
+      Bill Date: 12/09/2026 00:00
+      Check-in Date: 08/09/26
+      Check-out Date: 12/09/26
+      Total Amount: 22,050.00
+      HBD GST Number: 32AABCH5874R1Z0
+      Client GST Number: 32AABCT0238M2ZH
+      Match 1: Booking Code = N/A, Score = 100
+   📄 Processing 1 PDF(s) with email data
+   🏨 Property name from email table: Vivanta Ernakulam
+   🔍 Looking for vendor: 'Vivanta Ernakulam'
+   ❌ No exact match found for: 'Vivanta Ernakulam'
+   🏨 Extracted vendor: Vivanta Ernakulam
+   📁 Assigned to: UNASSIGNED
+   🔧 DEBUG: assigned_column type: <class 'str'>, value: 'UNASSIGNED'
+   💰 Amounts found: [1.0, 2.0, 4.0, 5.0, 6.0, 903.0, 8.0, 9.0, 7.0, 11.0, 12.0, 667.0, 30.0, 31.0, 32.0, 39.0, 682.0, 56.0, 600.0, 474.0, 91.0, 93.0, 500.0]
+   ⚡ Urgency: NORMAL
+   🔧 DEBUG: assigned_column='UNASSIGNED', folder_prefix='UNASSIGNED'
+   📄 Original filename: Invoice-201336000.pdf
+Uploading PDF bytes (400045 bytes) to blob storage as UNASSIGNED/2026-11-13_13:56_Invoice-201336000.pdf...
+Successfully uploaded PDF to: https://hbbills.blob.core.windows.net/bill/UNASSIGNED/2026-11-13_13:56_Invoice-201336000.pdf
+   ☁️  Uploaded PDF to Blob Storage: UNASSIGNED/Invoice-201336000.pdf
+   💾 Uploaded PDF 1: Invoice-201336000.pdf
+   ✅ Uploaded 1 PDF(s) to Blob Storage: UNASSIGNED folder
+
+   📊 Saving invoice data to MySQL...
+📊 Ensuring MySQL invoice table exists...
+✓ Invoice data table verified/created
+📊 Master Excel disabled - saving to MySQL only
+📊 Processing 1 invoice(s) for MySQL insertion...
+   📄 Processing invoice 1/1...
+   Multi Page PDF: Invoice-201336000.pdf -> yes
+   📋 PDF pdf_1 matched to 1 email table entry/entries - creating 1 MySQL row(s)
+   📝 SAVING TO MYSQL (Match 1/1 - PDF matched to email table entry 1) for 20261113_Invoice-201336000.pdf:
+      Hotel Name: Vivanta Ernakulam
+      Guest Name: Mr. H B Manish
+      Booking Code: Not Found (from email entry 1)
+      Email Amount: 22052.00
+   🕒 Stripping time from date: raw='12/09/2026 00:00' -> date_only='12/09/2026'
+   📋 MySQL row — new extracted fields:
+      room_charge: None
+      total_tariff: None
+      other_charges: None
+      total_igst: 0.0
+      total_taxes: None
+      discount: 0.0
+      advance_received: None
+   ✅ Inserted row to MySQL database (ID: 8, S.No: None)
+   🏷️  Classification flags applied to row ID 8: b2b
+   ✅ Successfully saved to MySQL
+📊 Summary: 1 row(s) were processed - MySQL insertion was attempted for each row above
+✅ All invoice data saved to MySQL (Master Excel disabled)
+   ✅ Invoice data saved to MySQL (1 row(s))
+
+📨 Processing email 133/294 (2026-09-14)
+   From: Reservations The Park Hyderabad <resv.hyd@theparkhotels.com>
+   Subject: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 134/294 (2026-09-14)
+   From: FORTUNE PARK SISHMO RESERVATIONS <reservations.fps@fortunehotels.in>
+   Subject: Re: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 135/294 (2026-09-14)
+   From: "Avaya Kar :: Accounts SPL" <acct@swostipremium.com>
+   Subject: RE: Advance payment statement for the day of 12/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 136/294 (2026-09-14)
+   From: trvrt.gs.reservations@hyatt.com
+   Subject: [#615204384] Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 137/294 (2026-09-14)
+   From: Reservations - Hometel Chandigarh <chh@sarovarhotels.com>
+   Subject: RE: Advance payment statement for the day of 14/09/2026
+   📄 Regular email (no PDF) - leaving IMAP flags unchanged
+
+📨 Processing email 138/294 (2026-09-14)
+   🔎 Detected 1 PDF(s) by content
+   From: HB BANQUET <banquet@hummingbirdindia.com>
+   Subject: Fwd: HUMMINGBIRD DIGITAL PVT LTD INVOICE NO- 196, 197
+   🎯 INVOICE DETECTED! (PDF attachment found)
+   🔎 Detected 1 PDF(s) by content
+   🔎 Parsing HTML tables for booking data...
+   🧾 Detected 5 HTML table(s) in email body
+   ⚠️  No booking-relevant tables detected in HTML body
+   🔄 No table entries found - using OpenAI to extract ALL booking entries from email...
+   🤖 Using OpenAI to extract ALL booking entries from email...
+   ✅ OpenAI extracted 1 booking entry/entries from email
+      Entry 1:
+         • guest_name: Jabreen Humming Bird Digital Pvt Ltd
+         • property_name: Davanam Sarovar Portico Suites
+         • check_in_date: 2026-09-07
+         • check_out_date: 2026-09-08
+   ✅ Copied property_name from OpenAI extracted entry to top-level: Davanam Sarovar Portico Suites
+   ✅ Using 1 entry/entries extracted by OpenAI
+   ⚠️  No booking code found via HTML tables or OpenAI
+   👤 Guest name(s) from email: Jabreen Humming Bird Digital Pvt Ltd
+   📎 Found 1 attachment(s)
+   📎 Processing 1 valid attachment(s)
+   📄 Found 1 PDF attachment(s) for analysis
+   📄 Analyzing PDF: HUMMINGBIRD DIGITAL PVT LTD INVOICE NO- 196, 197.pdf
+   📄 Processing PDF HUMMINGBIRD DIGITAL PVT LTD INVOICE NO- 196, 197.pdf using image-based extraction 
+   📤 Multi-page PDF (3 pages): upload + Stage 1 detection + Stage 2 extraction
+   📤 Uploading 3 image(s) to Azure Blob Storage...
+      ✅ Uploaded: tmpnky17160_0.jpg -> https://hbbills.blob.core.windows.net/bill/temp_im...
+      ✅ Uploaded: tmpna197b48_1.jpg -> https://hbbills.blob.core.windows.net/bill/temp_im...
+      ✅ Uploaded: tmpqt50scyr_2.jpg -> https://hbbills.blob.core.windows.net/bill/temp_im...
+   ⏳ Waiting 2 seconds for image URLs to propagate...
+   ✅ Loaded classify+detect prompt (A) from /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/prompts/classify_detect_prompt.txt (6286 chars)
+   🔎 Stage 1: invoice structure detection for HUMMINGBIRD DIGITAL PVT LTD INVOICE NO- 196, 197.pdf (3 pages)...
+   🐦 Hummingbird logo detect (HUMMINGBIRD DIGITAL PVT LTD INVOICE NO- 196, 197.pdf segment 1 pages 1-2)...
+   🐦 Logo detect (HUMMINGBIRD DIGITAL PVT LTD INVOICE NO- 196, 197.pdf segment 1 pages 1-2) -> logo_found=False confidence=high reason="The invoice shows the company name 'HUMMINGBIRD DIGITAL PRIVATE LIMITED' in text (top/recipient and guest name fields) a"
+   🐦 Hummingbird logo detect (HUMMINGBIRD DIGITAL PVT LTD INVOICE NO- 196, 197.pdf segment 2 pages 3-3)...
+   🐦 Logo detect (HUMMINGBIRD DIGITAL PVT LTD INVOICE NO- 196, 197.pdf segment 2 pages 3-3) -> logo_found=False confidence=high reason="The invoice shows the company name 'HUMMINGBIRD DIGITAL PRIVATE LIMITED' as text, but there is no matching hummingbird/p"
+   ✅ Stage 1 result: 2 invoice segment(s): [(1, 2), (3, 3)]
+   🏷️  Stage 1 classifications: ['b2b', 'b2b']
+   📎 Stage 1 — differences_from_previous:
+      Invoice 2 (pages 3–3): (not provided by model)
+   ✅ Successfully loaded prompt from /home/ubuntu/Invoice-processor/Invoice-automation/Invoice-Processor-Handover/prompts/prompt.txt (23993 chars)
+   📄 Reusing 3 uploaded page image(s) for HUMMINGBIRD DIGITAL PVT LTD INVOICE NO- 196, 197.pdf
+   🔄 Extracting structured data using gpt-5-mini...
+      ⏳ Waiting 3 seconds before first API call to ensure URLs are ready...
+      🔍 Using max_completion_tokens: 8000 (attempt 1)

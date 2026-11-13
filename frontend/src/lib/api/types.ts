@@ -53,6 +53,15 @@ export type MailboxCounts = {
   pdfs_found: number;
 };
 
+export type InvoiceDbSummary = {
+  fromDate: string;
+  toDate: string;
+  emailsFound: number;
+  emailsProcessed: number;
+  invoicesFound: number;
+  invoicesProcessed: number;
+};
+
 export type MatchRateTrendPoint = {
   date: string;
   matched: number;

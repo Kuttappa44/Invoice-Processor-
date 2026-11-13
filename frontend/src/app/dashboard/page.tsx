@@ -15,6 +15,7 @@ import {
   type InvoiceDataSource,
   type InvoiceDbApiResponse,
   type InvoiceDbMatchFilter,
+  type InvoiceDbSummary,
   type InvoiceStats,
   type MailboxCounts,
   type MatchRateTrendPoint,
@@ -60,6 +61,8 @@ export function DashboardPage() {
   const [invoiceDbPage, setInvoiceDbPage] = useState(1);
   const [invoiceDbLoading, setInvoiceDbLoading] = useState(false);
   const [invoiceDbError, setInvoiceDbError] = useState<string | null>(null);
+  const [invoiceDbSummary, setInvoiceDbSummary] =
+    useState<InvoiceDbSummary | null>(null);
   const [stats, setStats] = useState<InvoiceStats | null>(null);
   const [mailboxCounts, setMailboxCounts] = useState<MailboxCounts | null>(
     null,
@@ -214,6 +217,7 @@ export function DashboardPage() {
     setInvoiceDbRows([]);
     setInvoiceDbMeta(null);
     setInvoiceDbError(null);
+    setInvoiceDbSummary(null);
     setInvoiceDbPage(1);
     if (graphInitialLoad.current && graphFromDate && graphToDate) {
       loadMatchRateGraph();
@@ -312,17 +316,22 @@ export function DashboardPage() {
         return;
       }
       const targetPage = Math.max(1, page);
+      const loadedFrom = invoiceDbFromDate;
+      const loadedTo = invoiceDbToDate;
       setInvoiceDbLoading(true);
       setInvoiceDbError(null);
       try {
-        const res = await getInvoiceRows({
-          fromDate: invoiceDbFromDate,
-          toDate: invoiceDbToDate,
-          match: invoiceDbMatch,
-          source: dataSource,
-          limit: INVOICE_DB_PAGE_SIZE,
-          offset: (targetPage - 1) * INVOICE_DB_PAGE_SIZE,
-        });
+        const [res, mailboxRes] = await Promise.all([
+          getInvoiceRows({
+            fromDate: loadedFrom,
+            toDate: loadedTo,
+            match: invoiceDbMatch,
+            source: dataSource,
+            limit: INVOICE_DB_PAGE_SIZE,
+            offset: (targetPage - 1) * INVOICE_DB_PAGE_SIZE,
+          }),
+          getMailboxCounts(loadedFrom, loadedTo, dataSource),
+        ]);
         if (!res.ok) {
           const t = await res.text();
           throw new Error(t || "Failed to load invoice data");
@@ -337,6 +346,20 @@ export function DashboardPage() {
           offset: data.offset ?? 0,
         });
         setInvoiceDbPage(targetPage);
+        if (mailboxRes.ok) {
+          const mailbox = (await mailboxRes.json()) as MailboxCounts;
+          setInvoiceDbSummary({
+            fromDate: loadedFrom,
+            toDate: loadedTo,
+            emailsFound: mailbox.emails ?? 0,
+            emailsProcessed: mailbox.emails_found ?? 0,
+            invoicesFound: mailbox.pdfs ?? 0,
+            invoicesProcessed: mailbox.pdfs_found ?? 0,
+          });
+        } else {
+          setInvoiceDbSummary(null);
+          toast.error("Failed to load email and invoice counts");
+        }
         if (!data.rows?.length) {
           toast.success("No rows in this range / filter");
         } else {
@@ -348,6 +371,7 @@ export function DashboardPage() {
         setInvoiceDbColumns([]);
         setInvoiceDbRows([]);
         setInvoiceDbMeta(null);
+        setInvoiceDbSummary(null);
         toast.error(msg);
       } finally {
         setInvoiceDbLoading(false);
@@ -472,6 +496,7 @@ export function DashboardPage() {
               page={invoiceDbPage}
               loading={invoiceDbLoading}
               error={invoiceDbError}
+              summary={invoiceDbSummary}
               onFromDate={setInvoiceDbFromDate}
               onToDate={setInvoiceDbToDate}
               onMatch={setInvoiceDbMatch}

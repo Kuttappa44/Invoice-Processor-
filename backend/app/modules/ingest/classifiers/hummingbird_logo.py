@@ -154,7 +154,7 @@ def invoice_contains_hummingbird_logo(
                 resp = client.chat.completions.create(
                     model=model,
                     messages=[{"role": "user", "content": content}],
-                    max_completion_tokens=256,
+                    max_completion_tokens=1024,
                 )
                 last_raw = resp.choices[0].message.content or ""
             else:

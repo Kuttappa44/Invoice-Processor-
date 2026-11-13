@@ -76,5 +76,56 @@ class CronShimTests(unittest.TestCase):
         self.assertIn("_ingest_process_invoices", src)
 
 
+class InvoiceExportSummaryTests(unittest.TestCase):
+    def test_summary_row_uses_mailbox_totals(self):
+        from backend.app.modules.invoices.queries import build_invoice_export_summary_frame
+
+        frame = build_invoice_export_summary_frame(
+            "2026-11-01",
+            "2026-11-02",
+            "matched",
+            "xtract",
+            {
+                "emails": 10,
+                "emails_found": 8,
+                "pdfs": 4,
+                "pdfs_found": 3,
+            },
+        )
+        row = frame.iloc[0]
+        self.assertEqual(row["Source"], "XtractBills")
+        self.assertEqual(row["From Date"], "2026-11-01")
+        self.assertEqual(row["To Date"], "2026-11-02")
+        self.assertEqual(row["Match"], "matched")
+        self.assertEqual(row["Emails Found"], 10)
+        self.assertEqual(row["Emails Processed"], 8)
+        self.assertEqual(row["Invoices Found"], 4)
+        self.assertEqual(row["Invoices Processed"], 3)
+
+    def test_multi_day_summary_includes_each_day(self):
+        from backend.app.modules.invoices.queries import build_invoice_export_daily_frame
+
+        single = build_invoice_export_daily_frame(
+            "2026-11-01",
+            "2026-11-01",
+            {"days": [{"date": "2026-11-01", "emails": 1, "emails_found": 1, "pdfs": 1, "pdfs_found": 1}]},
+        )
+        self.assertIsNone(single)
+
+        daily = build_invoice_export_daily_frame(
+            "2026-11-01",
+            "2026-11-02",
+            {
+                "days": [
+                    {"date": "2026-11-01", "emails": 6, "emails_found": 5, "pdfs": 3, "pdfs_found": 2},
+                    {"date": "2026-11-02", "emails": 4, "emails_found": 3, "pdfs": 1, "pdfs_found": 1},
+                ]
+            },
+        )
+        self.assertEqual(list(daily["Date"]), ["2026-11-01", "2026-11-02"])
+        self.assertEqual(int(daily.iloc[0]["Emails Found"]), 6)
+        self.assertEqual(int(daily.iloc[1]["Invoices Processed"]), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

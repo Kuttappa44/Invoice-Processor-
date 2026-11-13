@@ -23,6 +23,7 @@ from backend.app.modules.ingest.email_parse import (
 )
 from backend.app.modules.ingest.persist import update_excel_sheet
 from backend.app.modules.ingest.vendor import find_vendor_column, upload_pdf_to_blob_storage
+from backend.app.shared.run_excels import clear_run_excels
 from backend.app.shared.text import normalize_field_text
 from backend.app.integrations.azure_blob import sanitize_blob_url
 from backend.app.integrations.gmail_imap import (
@@ -230,11 +231,14 @@ def process_invoices(
             print(f"{'='*70}")
             try:
                 from backend.app.modules.matching.service import run as _run_step7
-                _run_step7(
+                step7_result = _run_step7(
                     push=True,
                     immediate_push=True,
                 )
-                print(f"   ✅ Step-7 matching + API push completed")
+                if step7_result == "skipped":
+                    print("   ⏭️  Step-7 skipped: no unpushed MySQL rows")
+                else:
+                    print(f"   ✅ Step-7 matching + API push completed")
             except Exception as _step7_err:
                 print(f"   ⚠️  Step-7 auto-trigger failed (non-fatal): {_step7_err}")
                 import traceback
@@ -610,4 +614,5 @@ def process_invoices(
             mail.logout()
         except Exception:
             pass
+        clear_run_excels()
 

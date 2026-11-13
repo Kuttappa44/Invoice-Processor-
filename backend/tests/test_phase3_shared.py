@@ -63,6 +63,47 @@ class GuestNameTests(unittest.TestCase):
         self.assertTrue(guest_names_match_for_merge("Ada Lovelace", "Ada Lovelace"))
 
 
+class RunExcelFolderTests(unittest.TestCase):
+    def test_instance_folders_and_cleanup_stay_separate(self):
+        import os
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+
+        from backend.app.shared.run_excels import (
+            clear_run_excels,
+            run_excel_dir,
+            scheduled_instance_id,
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            previous = os.getcwd()
+            os.chdir(tmp)
+            try:
+                with patch.dict(os.environ, {"SCHEDULED_INSTANCE": "b"}):
+                    self.assertEqual(scheduled_instance_id(), "b")
+                    self.assertEqual(run_excel_dir("api"), Path("api_b"))
+                    self.assertEqual(run_excel_dir("push"), Path("push_b"))
+                    Path("api_b").mkdir()
+                    Path("push_b").mkdir()
+                    Path("api_a").mkdir()
+                    (Path("api_b") / "booking_data_1.xlsx").write_bytes(b"x")
+                    (Path("push_b") / "invoice_report.xlsx").write_bytes(b"x")
+                    (Path("api_a") / "booking_data_1.xlsx").write_bytes(b"keep")
+                    (Path("api_b") / "notes.txt").write_text("keep", encoding="utf-8")
+                    clear_run_excels()
+                    self.assertFalse((Path("api_b") / "booking_data_1.xlsx").exists())
+                    self.assertFalse((Path("push_b") / "invoice_report.xlsx").exists())
+                    self.assertTrue((Path("api_a") / "booking_data_1.xlsx").exists())
+                    self.assertTrue((Path("api_b") / "notes.txt").exists())
+                with patch.dict(os.environ, {"SCHEDULED_INSTANCE": "../b"}):
+                    self.assertEqual(scheduled_instance_id(), "b")
+                with patch.dict(os.environ, {"SCHEDULED_INSTANCE": ""}):
+                    self.assertEqual(scheduled_instance_id(), "a")
+            finally:
+                os.chdir(previous)
+
+
 class PdfPageTests(unittest.TestCase):
     def test_missing_bytes_are_not_multi_page(self):
         from backend.app.shared.pdf_pages import count_pdf_pages, is_multi_page_pdf

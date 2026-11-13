@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
@@ -38,6 +39,7 @@ from backend.app.shared.dates import (
 from backend.app.shared.guest_names import guest_names_match_for_merge
 from backend.app.shared.money import AMOUNT_GATE_TOLERANCE_INR
 from backend.app.shared.money import normalize_amount as _normalize_amount
+from backend.app.shared.run_excels import run_excel_dir
 from backend.app.shared.text import normalize_booking_code_value
 from backend.app.integrations.azure_blob import sanitize_blob_url
 from backend.app.modules.matching.excel import find_matching_column
@@ -328,8 +330,8 @@ def run(
     if dry_run:
         print("DRY RUN: amount gate runs, no HTTP push, no push-outcome MySQL writes")
     print("=" * 70)
-    print("1) Generate API Excel via test1.py")
-    print("2) Match extracted rows to API rows")
+    print("1) Load unpushed MySQL rows (skip when none)")
+    print("2) Generate API Excel via test1.py and match extracted rows")
     print("3) Fill status/flags/remarks/amount_match/amount_difference")
     print("4) Save updated extracted Excel (invoice report)")
     print("5) Optionally push matched rows to API")
@@ -373,18 +375,19 @@ def run(
         except (ValueError, TypeError):
             return None
 
-    # 1) Generate API Excel from test1.py
+    # 1) Unpushed rows are required. Check before the booking-list download.
+    from backend.app.modules.invoices.mysql import read_mysql_data_as_dataframe
+    extracted_df = read_mysql_data_as_dataframe(only_unpushed=True)
+    if extracted_df is None or extracted_df.empty:
+        print("⏭️  Step-7 skipped: no unpushed rows in MySQL (pushed_at=0 or NULL).")
+        return "skipped"
+
+    # 2) Generate API Excel from test1.py
     print("\n📥 Generating API Excel from test1.py ...")
     generated_api_excel = booking_api.main()
     if not generated_api_excel or not Path(generated_api_excel).exists():
         raise FileNotFoundError("test1.py did not return a valid generated Excel path.")
     print(f"✅ Generated API Excel: {generated_api_excel}")
-
-    # 2) Read source files — extracted rows come from MySQL (pushed_at=0 or NULL only)
-    from backend.app.modules.invoices.mysql import read_mysql_data_as_dataframe
-    extracted_df = read_mysql_data_as_dataframe(only_unpushed=True)
-    if extracted_df is None or extracted_df.empty:
-        raise ValueError("No unpushed rows found in MySQL (pushed_at=0 or NULL).")
     api_df = pd.read_excel(generated_api_excel)
 
     extracted_map = _build_field_map(extracted_df)
@@ -840,7 +843,9 @@ def run(
         out_file = Path(output_path)
     else:
         stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        out_file = Path(__file__).resolve().parent / f"invoice_report_step7_no_mysql_{stamp}.xlsx"
+        push_dir = run_excel_dir("push")
+        push_dir.mkdir(parents=True, exist_ok=True)
+        out_file = push_dir / f"invoice_report_step7_no_mysql_{stamp}.xlsx"
     extracted_df.to_excel(out_file, index=False)
 
     print(f"\n✅ Rows matched: {rows_updated}")

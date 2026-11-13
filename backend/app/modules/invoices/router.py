@@ -218,7 +218,11 @@ async def download_mysql_excel_by_date_range(
 
         # Call the export function
         excel_file_path = export_invoice_data_by_date_range(
-            from_date, to_date, match_filter=m, table_name=table_name
+            from_date,
+            to_date,
+            match_filter=m,
+            table_name=table_name,
+            source=source_id,
         )
 
         if not excel_file_path or not os.path.exists(excel_file_path):

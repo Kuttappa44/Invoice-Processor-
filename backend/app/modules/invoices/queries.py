@@ -622,6 +622,56 @@ def fetch_mailbox_daily_counts(
     }
 
 
+def _summary_count_row(day: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "Emails Found": int(day.get("emails") or 0),
+        "Emails Processed": int(day.get("emails_found") or 0),
+        "Invoices Found": int(day.get("pdfs") or 0),
+        "Invoices Processed": int(day.get("pdfs_found") or 0),
+    }
+
+
+def build_invoice_export_summary_frame(
+    from_date: str,
+    to_date: str,
+    match_filter: str,
+    source: Optional[str],
+    counts: Optional[Dict[str, Any]] = None,
+) -> pd.DataFrame:
+    """One-row Summary sheet: mailbox totals for the export's date range and source."""
+    source_id = (source or "bills").strip().lower()
+    if source_id not in _INVOICE_SOURCES:
+        source_id = "bills"
+    counts = counts or {}
+    return pd.DataFrame(
+        [
+            {
+                "Source": _INVOICE_SOURCES[source_id]["label"],
+                "From Date": from_date,
+                "To Date": to_date,
+                "Match": normalize_match_filter(match_filter),
+                **_summary_count_row(counts),
+            }
+        ]
+    )
+
+
+def build_invoice_export_daily_frame(
+    from_date: str,
+    to_date: str,
+    counts: Optional[Dict[str, Any]] = None,
+) -> Optional[pd.DataFrame]:
+    """One row per calendar day when the export covers more than one day."""
+    if from_date == to_date:
+        return None
+    days = (counts or {}).get("days") or []
+    if len(days) < 2:
+        return None
+    return pd.DataFrame(
+        [{"Date": day.get("date"), **_summary_count_row(day)} for day in days]
+    )
+
+
 def export_invoice_data_by_date_range(
     from_date: str,
     to_date: str,
@@ -629,6 +679,7 @@ def export_invoice_data_by_date_range(
     include_all_columns: bool = True,
     match_filter: str = "all",
     table_name: Optional[str] = None,
+    source: Optional[str] = None,
 ):
     """
     Export invoice_data table from MySQL to Excel file filtered by dashboard date range.
@@ -813,9 +864,32 @@ def export_invoice_data_by_date_range(
         existing_columns = [col for col in desired_column_order if col in df.columns]
         df = df[existing_columns]
         
-        # Save to Excel
+        mailbox_counts = fetch_mailbox_daily_counts(
+            from_date, to_date, source=source
+        )
+        summary_counts = mailbox_counts if isinstance(mailbox_counts, dict) else None
+        summary_df = build_invoice_export_summary_frame(
+            from_date,
+            to_date,
+            match_filter,
+            source,
+            summary_counts,
+        )
+        daily_df = build_invoice_export_daily_frame(from_date, to_date, summary_counts)
+
+        # Save to Excel: invoice rows, then the mailbox summary for this range.
         print(f"💾 Saving to Excel file: {output_file}")
-        df.to_excel(output_file, index=False, engine='openpyxl')
+        with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
+            df.to_excel(writer, sheet_name="Invoices", index=False)
+            summary_df.to_excel(writer, sheet_name="Summary", index=False)
+            if daily_df is not None:
+                # Blank row between the range total and the per-day rows.
+                daily_df.to_excel(
+                    writer,
+                    sheet_name="Summary",
+                    index=False,
+                    startrow=len(summary_df) + 2,
+                )
         
         # Apply formatting
         try:
@@ -880,6 +954,31 @@ def export_invoice_data_by_date_range(
             
             # Freeze header row
             ws.freeze_panes = 'A2'
+
+            summary_ws = wb["Summary"] if "Summary" in wb.sheetnames else None
+            if summary_ws is not None:
+                header_rows = [1]
+                for row in summary_ws.iter_rows(min_row=2, max_col=1):
+                    if row[0].value == "Date":
+                        header_rows.append(row[0].row)
+                        break
+                for header_row in header_rows:
+                    for cell in summary_ws[header_row]:
+                        if cell.value is None:
+                            continue
+                        cell.fill = header_fill
+                        cell.font = header_font
+                        cell.alignment = header_alignment
+                        cell.border = border
+                for header_row in header_rows:
+                    for col_idx, header_cell in enumerate(summary_ws[header_row], start=1):
+                        if header_cell.value is None:
+                            continue
+                        letter = get_column_letter(col_idx)
+                        width = max(18, len(str(header_cell.value)) + 2)
+                        current = summary_ws.column_dimensions[letter].width or 0
+                        summary_ws.column_dimensions[letter].width = max(current, width)
+                summary_ws.freeze_panes = "A2"
             
             # Save formatted workbook
             wb.save(output_file)

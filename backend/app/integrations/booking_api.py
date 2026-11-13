@@ -6,6 +6,8 @@ import pandas as pd
 from dotenv import load_dotenv
 from datetime import datetime
 
+from backend.app.shared.run_excels import run_excel_dir
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -137,8 +139,8 @@ def export_to_excel(data, filename=None):
     # Create DataFrame from the data
     df = pd.DataFrame(data)
     
-    # Always save to ./api folder
-    output_dir = "api"
+    # One folder per mailbox instance (api_a, api_b, api_c) so parallel runs do not share files.
+    output_dir = str(run_excel_dir("api"))
     os.makedirs(output_dir, exist_ok=True)
 
     # Generate filename with timestamp if not provided

@@ -15,9 +15,11 @@ from typing import List, Optional
 import pandas as pd
 from rapidfuzz import fuzz
 
+from backend.app.exceptions import ProcessCancelled
 from backend.app.integrations.azure_openai import OPENAI_AVAILABLE, OpenAI, client
 from backend.app.modules.ingest.pdf_pipeline import process_pdf_bytes
-from backend.app.shared.dates import format_date_to_dd_mm_yy
+from backend.app.shared.dates import format_date_to_dd_mm_yy, to_date
+from backend.app.shared.gstin import is_valid_gstin
 from backend.app.shared.text import normalize_field_text
 
 try:
@@ -2839,16 +2841,10 @@ def extract_comprehensive_email_data(email_message, subject, from_email, body):
                     
                             if pdf_guest_name != 'Not Found' and is_valid_guest_name_local(pdf_guest_name) and email_table_entries:
                                 def _to_date_for_match(value):
-                                    """Parse a date value into a date() for matching (supports many formats via existing formatter)."""
+                                    """Parse a date for matching, including 4-digit and 2-digit years."""
                                     if not value or value == 'Not Found':
                                         return None
-                                    try:
-                                        normalized = format_date_to_dd_mm_yy(str(value).strip())
-                                        if not normalized or normalized == 'Not Found':
-                                            return None
-                                        return datetime.strptime(normalized, '%d/%m/%y').date()
-                                    except Exception:
-                                        return None
+                                    return to_date(value)
 
                                 def _date_matches_or_pm1(email_value, invoice_value) -> bool:
                                     """True if dates match exactly or within ±1 day."""

@@ -749,10 +749,54 @@ body {
   margin: 0 0 12px 0;
 }
 
+.invoice-db__summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 14px 0;
+}
+
+.invoice-db__summary-item {
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-primary-hex, #c41e3a);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.invoice-db__summary-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.invoice-db__summary-value {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-text, #111827);
+}
+
+.invoice-db__summary-value--dates {
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .invoice-db__meta {
   font-size: 13px;
   color: var(--color-muted);
   margin: 0 0 10px 0;
+}
+
+@media (max-width: 900px) {
+  .invoice-db__summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .invoice-db__pagination {

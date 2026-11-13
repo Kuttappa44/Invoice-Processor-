@@ -7,6 +7,8 @@ import re
 from datetime import datetime
 from typing import Optional
 
+from sqlalchemy import text
+
 from backend.app.shared.dates import format_date_to_dd_mm_yy
 from backend.app.shared.text import normalize_field_text
 from backend.app.integrations.azure_blob import sanitize_blob_url

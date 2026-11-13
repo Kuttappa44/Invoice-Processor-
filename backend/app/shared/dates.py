@@ -14,6 +14,127 @@ from backend.app.shared.text import normalize_field_text
 # September 2026 onward uses email_date.
 EMAIL_DATE_CUTOVER = date(2026, 9, 1)
 
+_DATE_FORMATS = (
+    "%d/%m/%Y",
+    "%d/%m/%y",
+    "%Y-%m-%d",
+    "%d-%m-%Y",
+    "%d-%m-%y",
+    "%d %m %Y",
+    "%d %m %y",
+    "%d-%b-%Y",
+    "%d-%B-%Y",
+    "%d/%b/%Y",
+    "%d/%B/%Y",
+    "%d %b %Y",
+    "%d %B %Y",
+    "%d-%b-%y",
+    "%d-%B-%y",
+    "%b %d, %Y",
+    "%B %d, %Y",
+    "%d/%m/%Y %H:%M:%S",
+    "%d/%m/%y %H:%M:%S",
+    "%Y-%m-%d %H:%M:%S",
+    "%d-%m-%Y %H:%M:%S",
+)
+
+_MONTHS = {
+    "jan": 1,
+    "january": 1,
+    "feb": 2,
+    "february": 2,
+    "mar": 3,
+    "march": 3,
+    "apr": 4,
+    "april": 4,
+    "may": 5,
+    "jun": 6,
+    "june": 6,
+    "jul": 7,
+    "july": 7,
+    "aug": 8,
+    "august": 8,
+    "sep": 9,
+    "september": 9,
+    "oct": 10,
+    "october": 10,
+    "nov": 11,
+    "november": 11,
+    "dec": 12,
+    "december": 12,
+}
+
+
+def _year_number(year: str) -> Optional[int]:
+    digits = re.sub(r"\D", "", year or "")
+    if len(digits) == 4:
+        return int(digits)
+    if len(digits) == 2:
+        yy = int(digits)
+        return 2000 + yy if yy <= 68 else 1900 + yy
+    return None
+
+
+def _date_from_parts(day: str, month: str, year: str) -> Optional[date]:
+    year_n = _year_number(year)
+    if year_n is None:
+        return None
+    month_text = month.strip().lower()
+    try:
+        month_n = int(month_text) if month_text.isdigit() else _MONTHS.get(month_text)
+        if month_n is None:
+            return None
+        return date(year_n, month_n, int(day))
+    except (TypeError, ValueError):
+        return None
+
+
+def _clean_date_text(value: Any) -> str:
+    text = normalize_field_text(str(value).strip())
+    return re.sub(r"\s+\d{1,2}:\d{2}(?::\d{2})?\s*$", "", text).strip()
+
+
+def parse_date(value: Any) -> Optional[date]:
+    """Parse a date in any supported format. 4-digit and 2-digit years are the same day."""
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return None
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+
+    text = _clean_date_text(value)
+    if not text or text.lower() in ("nan", "none", "not found", "nat"):
+        return None
+
+    candidates = [text]
+    if " " in text:
+        candidates.append(text.split()[0])
+    for candidate in candidates:
+        for fmt in _DATE_FORMATS:
+            try:
+                return datetime.strptime(candidate, fmt).date()
+            except ValueError:
+                continue
+
+    if "/" in text:
+        parts = [part.strip() for part in text.split("/")]
+        if len(parts) == 3:
+            parsed = _date_from_parts(parts[0], parts[1], parts[2])
+            if parsed:
+                return parsed
+
+    if "-" in text and len(text) >= 8:
+        parts = [part.strip() for part in text.split("-")]
+        if len(parts) == 3:
+            if len(re.sub(r"\D", "", parts[0])) == 4:
+                parsed = _date_from_parts(parts[2], parts[1], parts[0])
+            else:
+                parsed = _date_from_parts(parts[0], parts[1], parts[2])
+            if parsed:
+                return parsed
+    return None
+
 
 def format_date_to_dd_mm_yy(value: Optional[str]) -> str:
     """Format date to dd/mm/yy format (2-digit year) and strip time if present"""
@@ -24,122 +145,14 @@ def format_date_to_dd_mm_yy(value: Optional[str]) -> str:
     if not value or value.lower() == "not found":
         return "Not Found"
 
-    # Strip time if present (e.g., "01/01/2024 00:00" or "01/01/2024 12:30:00")
-    # Remove time patterns like " 00:00", " 12:30", " 12:30:00", etc.
-    value = re.sub(r"\s+\d{1,2}:\d{2}(?::\d{2})?\s*$", "", value).strip()
-
-    try:
-        date_formats = [
-            "%d/%m/%Y",
-            "%d/%m/%y",
-            "%Y-%m-%d",
-            "%d-%m-%Y",
-            "%d-%m-%y",
-            "%d %m %Y",
-            "%d %m %y",
-            "%d-%b-%Y",
-            "%d-%B-%Y",
-            "%d/%b/%Y",
-            "%d/%B/%Y",
-            "%d %b %Y",
-            "%d %B %Y",
-            "%d-%b-%y",
-            "%d-%B-%y",
-            "%b %d, %Y",
-            "%B %d, %Y",
-            "%d/%m/%Y %H:%M:%S",
-            "%d/%m/%y %H:%M:%S",
-        ]
-
-        parsed_date = None
-        for fmt in date_formats:
-            try:
-                parsed_date = datetime.strptime(
-                    value.split()[0] if " " in value else value, fmt
-                )
-                break
-            except ValueError:
-                continue
-
-        if parsed_date:
-            return parsed_date.strftime("%d/%m/%y")
-
-        if "/" in value:
-            parts = value.split("/")
-            if len(parts) == 3:
-                day, month, year = parts
-                day = day.strip().zfill(2)
-                month = month.strip().zfill(2)
-                year = year.strip()
-                if len(year) == 4:
-                    year = year[2:]
-                return f"{day}/{month}/{year}"
-
-        if "-" in value and len(value) >= 8:
-            parts = value.split("-")
-            if len(parts) == 3:
-                try:
-                    if len(parts[0]) == 4:
-                        year, month, day = parts
-                        year = year[2:] if len(year) == 4 else year
-                        return f"{day.zfill(2)}/{month.zfill(2)}/{year}"
-                    else:
-                        day, month, year = parts
-                        month_lower = month.lower()
-                        month_map = {
-                            "jan": "01",
-                            "january": "01",
-                            "feb": "02",
-                            "february": "02",
-                            "mar": "03",
-                            "march": "03",
-                            "apr": "04",
-                            "april": "04",
-                            "may": "05",
-                            "jun": "06",
-                            "june": "06",
-                            "jul": "07",
-                            "july": "07",
-                            "aug": "08",
-                            "august": "08",
-                            "sep": "09",
-                            "september": "09",
-                            "oct": "10",
-                            "october": "10",
-                            "nov": "11",
-                            "november": "11",
-                            "dec": "12",
-                            "december": "12",
-                        }
-                        if month_lower in month_map:
-                            month = month_map[month_lower]
-                        year = year[2:] if len(year) == 4 else year
-                        return f"{day.zfill(2)}/{month.zfill(2)}/{year}"
-                except Exception:
-                    pass
-
-    except Exception:
-        pass
-
+    parsed = parse_date(value)
+    if parsed:
+        return parsed.strftime("%d/%m/%y")
     return value
 
 
 def to_date(value: Any):
-    if value is None or (isinstance(value, float) and pd.isna(value)):
-        return None
-    if isinstance(value, datetime):
-        return value.date()
-
-    text = str(value).strip()
-    if not text or text.lower() in ("nan", "none", "not found", "nat"):
-        return None
-    try:
-        normalized = format_date_to_dd_mm_yy(text)
-        if not normalized or normalized == "Not Found":
-            return None
-        return datetime.strptime(normalized, "%d/%m/%y").date()
-    except Exception:
-        return None
+    return parse_date(value)
 
 
 def date_delta(a: Any, b: Any) -> Optional[int]:
